@@ -6,7 +6,7 @@ import type { ArticleCardData } from "@/server/services/articleService";
 export function HeroCard({ article }: { article: ArticleCardData }) {
   return (
     <article>
-      {article.coverMedia?.url && <Link href={`/haber/${article.slug}`} className="relative block aspect-[16/9] w-full overflow-hidden bg-line dark:bg-line-dark">
+      {article.coverMedia?.url && <Link href={`/haber/${article.slug}`} className="relative block aspect-[16/9] w-full overflow-hidden bg-line dark:bg-line-dark lg:max-h-[320px]">
         <Image
           src={article.coverMedia.url}
           alt={article.coverMedia?.altText || article.title}
