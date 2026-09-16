@@ -4,6 +4,14 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.7.0 — 2026-09-17
+
+- Sekmeye ve kullanıcıya özel geçici metin kurtarma: başlık, spot, gövde ve SEO metinleri; elle geri alma, 24 saatlik geçerlilik ve başarılı kayıtta temizleme.
+- Editörde metin önizlemesi; beklenmedik kayıt hatasında metni koruyan açıklayıcı hata.
+- Haber kartlarında görselsiz içerik için tipografik düzen; büyük boş görsel alanı kaldırıldı.
+- Kategori sayfalarında yeni başlık düzeni, mobilde tek sütun, haber sayısı, kategori araması ve yararlı boş durum.
+- Medya aramasına ilgili haber başlığı eklendi; bilinmeyen dosya boyutu sıfır bayt gibi gösterilmiyor.
+
 ## 1.6.0 — 2026-09-17
 
 - Medya Merkezi: dosya adı/alternatif metin araması, sayfalama, dosya ve kullanım bilgileri.

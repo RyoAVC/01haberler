@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
 import { hasPermission } from "@/lib/auth/rbac";
@@ -100,6 +99,7 @@ async function generateUniqueSlug(title: string, ignoreId?: string): Promise<str
 
 export interface SaveArticleResult {
   error?: string;
+  savedId?: string;
 }
 
 export async function saveArticle(articleId: string | null, formData: FormData): Promise<SaveArticleResult> {
@@ -237,7 +237,7 @@ export async function saveArticle(articleId: string | null, formData: FormData):
 
   revalidatePath("/admin/haberler");
   revalidatePath("/");
-  redirect(`/admin/haberler/${savedId}/duzenle?kaydedildi=1`);
+  return { savedId: savedId! };
 }
 
 export interface BulkCreateResult {

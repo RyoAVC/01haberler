@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MediaPicker } from "@/components/admin/MediaPicker";
+import { EditorDraftRecovery } from "@/components/admin/EditorDraftRecovery";
+import { qualityText } from "@/lib/utils/articleQuality";
 import { saveArticle } from "@/server/actions/articleActions";
 import { suggestExcerptAction, suggestSeoMetaAction } from "@/server/actions/aiEditorActions";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
@@ -36,6 +39,7 @@ interface ExistingArticle {
 }
 
 interface Props {
+  userId?: string;
   categories: Option[];
   tags: Option[];
   authors: Option[];
@@ -51,13 +55,16 @@ const STATUS_OPTIONS = [
   { value: "PUBLISHED", label: "Yayınla" },
 ];
 
-export function ArticleForm({ categories, tags, authors, canPublish, article, aiEditorEnabled = false }: Props) {
+export function ArticleForm({ categories, tags, authors, canPublish, article, aiEditorEnabled = false, userId }: Props) {
+  const router = useRouter();
+  const [editorGeneration, setEditorGeneration] = useState(0);
   const [coverMediaId, setCoverMediaId] = useState(article?.coverMediaId ?? "");
   const [coverPreview, setCoverPreview] = useState<string | null>(article?.coverMediaUrl ?? null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [draftSaved, setDraftSaved] = useState(false);
   const [isBreaking, setIsBreaking] = useState(article?.isBreaking ?? false);
   const [title, setTitle] = useState(article?.title ?? "");
   const [contentHtml, setContentHtml] = useState(article?.contentHtml ?? "");
@@ -117,13 +124,22 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
     try {
       const result = await saveArticle(article?.id ?? null, formData);
       if (result?.error) setError(result.error);
+      else if (result.savedId) {
+        setDraftSaved(true);
+        try { sessionStorage.removeItem(`01h-editor:${userId}:${article?.id ?? "new"}`); } catch { /* unavailable */ }
+        router.push(`/admin/haberler/${result.savedId}/duzenle?kaydedildi=1`); router.refresh();
+      }
+    } catch {
+      setError("Kayıt tamamlanamadı. Metniniz bu formda korunuyor; bağlantınızı kontrol edip tekrar deneyin.");
     } finally { setSaving(false); }
   }
 
   return (
-    <form onSubmit={event => { event.preventDefault(); if (!saving) void handleSubmit(new FormData(event.currentTarget)); }} className="max-w-3xl space-y-6">
+    <form onInput={() => setDraftSaved(false)} onSubmit={event => { event.preventDefault(); if (!saving) void handleSubmit(new FormData(event.currentTarget)); }} className="max-w-3xl space-y-6">
       {article && <input type="hidden" name="expectedUpdatedAt" value={article.updatedAt ?? ""} />}
       {error && <p role="alert" className="border border-brand-red px-3 py-2 text-headline-s text-brand-red">{error}</p>}
+      {userId && <EditorDraftRecovery paused={saving || draftSaved} storageKey={`01h-editor:${userId}:${article?.id ?? "new"}`} value={{ title, excerpt, contentHtml, metaTitle, metaDescription }} baseline={{ title: article?.title ?? "", excerpt: article?.excerpt ?? "", contentHtml: article?.contentHtml ?? "", metaTitle: article?.metaTitle ?? "", metaDescription: article?.metaDescription ?? "" }} onRestore={draft => { setDraftSaved(false); setTitle(draft.title); setExcerpt(draft.excerpt); setContentHtml(draft.contentHtml); setMetaTitle(draft.metaTitle); setMetaDescription(draft.metaDescription); setEditorGeneration(current => current + 1); }} />}
+      <details className="rounded-lg border border-line-dark p-4"><summary className="cursor-pointer text-caption">Metin önizlemesi</summary><div className="mt-4 rounded-lg bg-white p-5 text-neutral-900"><h2 className="font-serif text-headline-l">{title || "Haber başlığı"}</h2><p className="mt-3 font-medium">{excerpt}</p><p className="mt-5 whitespace-pre-wrap text-body">{qualityText(contentHtml)}</p></div><p className="mt-2 text-caption text-ink-dark-secondary">Yayın öncesi metin kontrolü; sitenin tüm yerleşimini temsil etmez.</p></details>
       <ArticleQualityPanel value={{ title, excerpt, contentHtml, categoryId, coverMediaId, coverImageAlt, metaTitle, metaDescription }} />
 
       <div>
@@ -169,7 +185,7 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
           İçerik <span className="text-caption text-ink-secondary">— kaydedilirken otomatik olarak temizlenir</span>
         </label>
         <div className="mt-1">
-          <RichTextEditor name="contentHtml" initialContent={article?.contentHtml} onContentChange={setContentHtml} />
+          <RichTextEditor key={editorGeneration} name="contentHtml" initialContent={contentHtml} onContentChange={setContentHtml} />
         </div>
       </div>
 

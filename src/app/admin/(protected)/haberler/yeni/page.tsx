@@ -16,6 +16,7 @@ export default async function NewArticlePage() {
     <div>
       <h1 className="mb-6 font-serif text-headline-l">Yeni Haber</h1>
       <ArticleForm
+        userId={user!.id}
         categories={categories}
         tags={tags}
         authors={authors}

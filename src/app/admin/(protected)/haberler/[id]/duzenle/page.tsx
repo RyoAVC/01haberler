@@ -38,6 +38,7 @@ export default async function EditArticlePage({ params, searchParams }: Props) {
       <h1 className="mb-2 font-serif text-headline-l">Haberi Düzenle</h1>
       {kaydedildi && <p className="mb-4 border border-line px-3 py-2 text-headline-s dark:border-line-dark">Kaydedildi.</p>}
       <ArticleForm
+        userId={user.id}
         categories={categories}
         tags={tags}
         authors={authors}
