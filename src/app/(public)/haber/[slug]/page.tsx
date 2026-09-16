@@ -9,6 +9,7 @@ import {
 } from "@/server/services/articleService";
 import { formatDateTr } from "@/lib/utils/formatDate";
 import { newsArticleJsonLd, breadcrumbJsonLd } from "@/lib/seo/jsonld";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { SaveArticleButton } from "@/components/article/SaveArticleButton";
 import { ArticleViewTracker } from "@/components/article/ArticleViewTracker";
@@ -81,12 +82,12 @@ export default async function ArticleDetailPage({ params }: Props) {
       <ArticleViewTracker articleId={article.id} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(newsArticleJsonLd(article, canonicalUrl)) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(newsArticleJsonLd(article, canonicalUrl)) }}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
+          __html: serializeJsonLd(
             breadcrumbJsonLd([
               { name: "Ana Sayfa", url: appUrl },
               { name: article.category.name, url: `${appUrl}/kategori/${article.category.slug}` },

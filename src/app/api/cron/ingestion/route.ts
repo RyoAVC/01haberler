@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { env } from "@/lib/env";
 import { runIngestionJob } from "@/server/ingestion/runIngestionJob";
 import { isFeedDue } from "@/lib/utils/sourceDate";
+import { publishDueArticles } from "@/server/services/scheduledPublicationService";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -24,6 +25,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
+  const publishedScheduled = await publishDueArticles();
   const activeFeeds = await prisma.feed.findMany({ where: { isActive: true } });
 
   const results = [];
@@ -42,5 +44,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({ processedFeeds: results.length, results });
+  return NextResponse.json({ publishedScheduled, processedFeeds: results.length, results });
 }

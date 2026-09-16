@@ -24,6 +24,8 @@ interface ExistingArticle {
   metaDescription: string | null;
   canonicalUrl: string | null;
   status: string;
+  scheduledAt?: string;
+  updatedAt?: string;
   isBreaking: boolean;
   isFeatured: boolean;
   isEditorsPick: boolean;
@@ -40,6 +42,7 @@ interface Props {
 }
 
 const STATUS_OPTIONS = [
+  { value: "PENDING_REVIEW", label: "İncelemede" },
   { value: "DRAFT", label: "Taslak" },
   { value: "SCHEDULED", label: "Zamanlanmış" },
   { value: "PUBLISHED", label: "Yayınla" },
@@ -114,6 +117,7 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
 
   return (
     <form action={handleSubmit} className="max-w-3xl space-y-6">
+      {article && <input type="hidden" name="expectedUpdatedAt" value={article.updatedAt ?? ""} />}
       {error && <p role="alert" className="border border-brand-red px-3 py-2 text-headline-s text-brand-red">{error}</p>}
       <ArticleQualityPanel value={{ title, excerpt, contentHtml, categoryId, coverMediaId, coverImageAlt, metaTitle, metaDescription }} />
 
@@ -286,6 +290,7 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
           {STATUS_OPTIONS.map((s) => (
             <option key={s.value} value={s.value}>{s.label}</option>
           ))}
+          {article && !STATUS_OPTIONS.some(s => s.value === article.status) && <option value={article.status}>Mevcut durum: {article.status}</option>}
         </select>
         {!canPublish && (
           <p className="mt-1 text-caption text-ink-secondary dark:text-ink-dark-secondary">
@@ -293,8 +298,9 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
           </p>
         )}
         <label htmlFor="scheduledAt" className="mt-2 block text-caption text-ink-secondary dark:text-ink-dark-secondary">
-          Zamanlama (opsiyonel)
-          <input id="scheduledAt" type="datetime-local" name="scheduledAt" className="mt-1 block border border-line bg-transparent px-3 py-2 dark:border-line-dark" />
+          Yayın zamanı (Türkiye saati)
+          <input id="scheduledAt" type="datetime-local" name="scheduledAt" defaultValue={article?.scheduledAt ?? ""} className="mt-1 block border border-line bg-transparent px-3 py-2 dark:border-line-dark" />
+          <span className="mt-2 block">Zamanlı yayın için Durum alanında Zamanlanmış seçin. Yayın, zamanı geldikten sonraki ilk cron çalışmasında gerçekleşir.</span>
         </label>
       </div>
 

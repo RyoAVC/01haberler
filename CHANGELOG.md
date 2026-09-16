@@ -4,6 +4,17 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.5.0 — 2026-09-17
+
+- Türkiye saatiyle zamanlı yayın; geçersiz/geçmiş zaman kontrolü ve mevcut programın editörde gösterimi.
+- Yetkili cron çağrısı, zamanı gelen haberleri işlem içinde yayınlar; çakışan iş aynı haberi yeniden yayınlamaz. Sosyal paylaşım tetiklemez.
+- Haber düzenlemede sürüm kontrolü: başka bir işlem haberi değiştirdiyse eski form değişiklikleri ezemez.
+- Yazarlar yalnızca kendilerine atanmış veya kendilerinin oluşturduğu haberleri düzenleyebilir.
+- Son 10 düzenleme kaydı ile güncel metnin yan yana, salt okunur karşılaştırması.
+- İncelemede durumunun editör formunda korunması; zamanlı olmayan kayıtlarda eski programın temizlenmesi.
+- Haber yapılandırılmış verisinde HTML kapanış etiketleri güvenli kodlanıyor.
+- 79 birim testi; zaman dilimi, çakışan cron, sahiplik, eşzamanlı düzenleme ve JSON-LD güvenliği senaryoları dahil.
+
 ## 1.4.0 — 2026-09-17
 
 - Ana sayfa için görselli manşet düzeni, kategori bölümleri ve yeni piyasa paneli.

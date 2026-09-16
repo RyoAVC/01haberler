@@ -12,6 +12,8 @@ import { estimateReadingTimeMinutes } from "@/lib/utils/readingTime";
 import { findBannedWordMatches } from "@/server/services/bannedWordService";
 import { postArticleToSocialPlatforms, pingGoogleSitemap } from "@/server/services/socialPostService";
 import type { ArticleStatus } from "@prisma/client";
+import { parsePublicationSchedule } from "@/lib/utils/publicationSchedule";
+import { canEditArticle } from "@/server/services/articleAccessService";
 
 async function requirePermission(permission: Parameters<typeof hasPermission>[1]) {
   const user = await getCurrentUser();
@@ -102,6 +104,10 @@ export interface SaveArticleResult {
 
 export async function saveArticle(articleId: string | null, formData: FormData): Promise<SaveArticleResult> {
   const user = await requirePermission(articleId ? "article:edit:own" : "article:create");
+  if (articleId && !await canEditArticle(user, articleId)) return { error: "Bu haberi düzenleme yetkiniz yok." };
+  let scheduledAt: Date | null;
+  try { scheduledAt = parsePublicationSchedule(String(formData.get("scheduledAt") ?? "")); }
+  catch { return { error: "Geçerli bir yayın zamanı girin (Türkiye saati)." }; }
 
   const raw = {
     title: String(formData.get("title") ?? ""),
@@ -119,7 +125,7 @@ export async function saveArticle(articleId: string | null, formData: FormData):
     isBreaking: formData.get("isBreaking") === "on",
     isFeatured: formData.get("isFeatured") === "on",
     isEditorsPick: formData.get("isEditorsPick") === "on",
-    scheduledAt: (formData.get("scheduledAt") as string) || null,
+    scheduledAt,
   };
 
   const parsed = articleInputSchema.safeParse(raw);
@@ -128,6 +134,7 @@ export async function saveArticle(articleId: string | null, formData: FormData):
   }
 
   const data = parsed.data;
+  if (!hasPermission(user.role, "article:edit:any")) data.authorId = (await prisma.author.findUnique({ where: { userId: user.id }, select: { id: true } }))?.id ?? null;
   const sanitizedContent = sanitizeArticleHtml(data.contentHtml);
   const readingTimeMinutes = estimateReadingTimeMinutes(sanitizedContent);
 
@@ -138,17 +145,20 @@ export async function saveArticle(articleId: string | null, formData: FormData):
 
   const canPublish = hasPermission(user.role, "article:publish");
   const finalStatus: ArticleStatus = canPublish ? data.status : "PENDING_REVIEW";
+  if (finalStatus === "SCHEDULED" && (!data.scheduledAt || data.scheduledAt <= new Date())) return { error: "Zamanlanmış haber için gelecekte bir yayın zamanı seçin." };
 
   let savedId = articleId;
 
   if (articleId) {
+    const expectedUpdatedAt = String(formData.get("expectedUpdatedAt") ?? "");
+    if (!expectedUpdatedAt || !Number.isFinite(Date.parse(expectedUpdatedAt))) return { error: "Düzenleme oturumu güncel değil. Sayfayı yenileyin." };
     const publishedAtUpdate =
       finalStatus === "PUBLISHED"
         ? { publishedAt: (await prisma.article.findUnique({ where: { id: articleId }, select: { publishedAt: true } }))?.publishedAt ?? new Date() }
         : {};
 
-    await prisma.article.update({
-      where: { id: articleId },
+    try { await prisma.article.update({
+      where: { id: articleId, updatedAt: new Date(expectedUpdatedAt) },
       data: {
         title: data.title,
         excerpt: data.excerpt,
@@ -166,7 +176,7 @@ export async function saveArticle(articleId: string | null, formData: FormData):
         breakingEndAt: data.isBreaking ? data.breakingEndAt : null,
         isFeatured: data.isFeatured,
         isEditorsPick: data.isEditorsPick,
-        scheduledAt: data.scheduledAt,
+        scheduledAt: finalStatus === "SCHEDULED" ? data.scheduledAt : null,
         readingTimeMinutes,
         tags: {
           deleteMany: {},
@@ -174,7 +184,10 @@ export async function saveArticle(articleId: string | null, formData: FormData):
         },
         ...publishedAtUpdate,
       },
-    });
+    }); } catch (error) {
+      if ((error as { code?: string }).code === "P2025") return { error: "Bu haber siz düzenlerken değiştirildi. Metninizi kopyalayın, sayfayı yenileyip güncel sürümle karşılaştırın." };
+      throw error;
+    }
 
     await prisma.articleRevision.create({
       data: {
@@ -209,7 +222,7 @@ export async function saveArticle(articleId: string | null, formData: FormData):
         breakingStartAt: data.isBreaking ? new Date() : null,
         isFeatured: data.isFeatured,
         isEditorsPick: data.isEditorsPick,
-        scheduledAt: data.scheduledAt,
+        scheduledAt: finalStatus === "SCHEDULED" ? data.scheduledAt : null,
         readingTimeMinutes,
         publishedAt: finalStatus === "PUBLISHED" ? new Date() : null,
         tags: { create: data.tagIds.map((tagId) => ({ tagId })) },
