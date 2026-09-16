@@ -6,16 +6,16 @@ import type { ArticleCardData } from "@/server/services/articleService";
 export function HeroCard({ article }: { article: ArticleCardData }) {
   return (
     <article>
-      <Link href={`/haber/${article.slug}`} className="relative block aspect-[16/9] w-full overflow-hidden bg-line dark:bg-line-dark sm:aspect-[16/9]">
+      {article.coverMedia?.url && <Link href={`/haber/${article.slug}`} className="relative block aspect-[16/9] w-full overflow-hidden bg-line dark:bg-line-dark">
         <Image
-          src={article.coverMedia?.url || "/images/placeholder-news.svg"}
+          src={article.coverMedia.url}
           alt={article.coverMedia?.altText || article.title}
           fill
           priority
           className="object-cover"
           sizes="(max-width: 1024px) 100vw, 66vw"
         />
-      </Link>
+      </Link>}
       <div className="pt-4">
         <Link href={`/kategori/${article.category.slug}`} className="kicker">
           {article.category.name}

@@ -36,7 +36,7 @@ interface AdUnitProps {
 }
 
 /**
- * Reklam alani her zaman sabit yukseklikle ayrilir (CLS onlemi). Gercek
+ * Manuel gorsellerin en-boy orani yuklenmeden once ayrilir (CLS onlemi). Gercek
  * reklam icerigi yalnizca kullanici onayi verildiginde ve alan gorunur
  * hale geldiginde (ilk katlanti disi ise hemen) yuklenir; otomatik
  * yenileme veya tiklama tesviki yoktur.
@@ -45,6 +45,7 @@ export function AdUnit({ ad, adsenseEnabled, publisherId, eager = false }: AdUni
   const containerRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(eager);
   const [consented, setConsented] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const impressionSent = useRef(false);
 
   useEffect(() => {
@@ -82,16 +83,20 @@ export function AdUnit({ ad, adsenseEnabled, publisherId, eager = false }: AdUni
   }, [visible, ad.id, ad.provider, adsenseEnabled, publisherId, consented]);
 
   const minHeight = ad.height ? `${ad.height}px` : "100px";
+  const manualImageStyle = {
+    aspectRatio: ad.width && ad.height ? `${ad.width} / ${ad.height}` : "16 / 5",
+    maxWidth: ad.width || 970,
+  };
 
   function handleClick() {
     navigator.sendBeacon?.(`/api/ads/${ad.id}/click`);
   }
 
   return (
-    <div ref={containerRef} style={{ minHeight }} className="flex w-full flex-col items-center justify-center">
+    <div ref={containerRef} style={ad.provider === "MANUAL" ? undefined : { minHeight }} className="flex w-full flex-col items-center justify-center">
       <span className="ad-slot-label">Reklam</span>
       {!visible ? (
-        <div style={{ minHeight }} className="w-full rounded bg-neutral-100 dark:bg-neutral-800" />
+        <div style={ad.provider === "MANUAL" && ad.imageMedia ? manualImageStyle : { minHeight }} className="mx-auto w-full rounded bg-neutral-100 dark:bg-neutral-800" />
       ) : ad.provider === "MANUAL" ? (
         <a
           href={ad.targetUrl ?? "#"}
@@ -101,8 +106,10 @@ export function AdUnit({ ad, adsenseEnabled, publisherId, eager = false }: AdUni
           className="block w-full"
         >
           {ad.imageMedia ? (
-            <div className="relative w-full" style={{ aspectRatio: ad.width && ad.height ? `${ad.width} / ${ad.height}` : "16 / 5" }}>
-              <Image src={ad.imageMedia.url} alt={ad.headline ?? "Reklam"} fill className="object-contain" />
+            <div className="relative mx-auto w-full" style={manualImageStyle}>
+              {imageFailed ? <div className="flex h-full items-center justify-center border border-line px-4 text-center text-meta text-ink-secondary dark:border-line-dark dark:text-ink-dark-secondary">
+                {ad.headline?.trim() || "Reklam içeriği şu anda görüntülenemiyor."}
+              </div> : <Image src={ad.imageMedia.url} alt={ad.headline ?? "Reklam"} fill className="object-contain" onError={() => setImageFailed(true)} sizes="(max-width: 768px) 100vw, 970px" />}
             </div>
           ) : (
             <div style={{ minHeight }} className="flex items-center justify-center rounded border border-dashed border-neutral-300 text-sm text-neutral-400">

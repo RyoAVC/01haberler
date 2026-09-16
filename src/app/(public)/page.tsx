@@ -18,6 +18,7 @@ import {
 import { getActivePoll } from "@/server/services/pollService";
 import { isModuleEnabled } from "@/server/services/moduleFlagsService";
 import { prisma } from "@/lib/db";
+import { isEditorialArticle, selectHeadlines } from "@/lib/utils/headlines";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +40,7 @@ export default async function HomePage() {
     await Promise.all([
       getFeaturedArticles(4),
       getLatestArticles(6),
-      getMostRead(6),
+      getMostRead(7),
       getArticlesByCategorySlugForHome("gundem", 6),
       getArticlesByCategorySlugForHome("dunya", 4),
       getArticlesByCategorySlugForHome("ekonomi", 6),
@@ -52,7 +53,7 @@ export default async function HomePage() {
 
   const activePoll = pollsEnabled ? await getActivePoll() : null;
 
-  const heroArticles = featured.length > 0 ? featured : latest.slice(0, 4);
+  const heroArticles = selectHeadlines(featured, latest);
   const mainHero = heroArticles[0];
   const secondaryHero = heroArticles.slice(1, 4);
 
@@ -63,23 +64,19 @@ export default async function HomePage() {
       </div>
 
       {mainHero && (
-        <section aria-label="Manşetler" className="grid gap-8 pb-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <section aria-label="Manşetler" className={`grid gap-8 pb-8 ${secondaryHero.length ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""}`}>
           <HeroCard article={mainHero} />
-          <div className="flex flex-col gap-3">
+          {secondaryHero.length > 0 && <div className="flex flex-col gap-3">
             {secondaryHero.map((a, i) => (
               <SecondaryHeadline key={a.id} article={a} showRule={i > 0} />
             ))}
-          </div>
+          </div>}
         </section>
       )}
 
       <AdSlot placement="HOME_BELOW_HERO" eager />
 
-      <div className="grid gap-10 py-6 lg:grid-cols-[260px_minmax(0,1fr)_320px]">
-        <aside className="order-last flex flex-col gap-8 lg:order-none">
-          <FixturesWidget />
-        </aside>
-
+      <div className="grid gap-10 py-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex flex-col gap-10">
           {gundem.length > 0 && (
             <section aria-label="Gündem">
@@ -157,7 +154,7 @@ export default async function HomePage() {
           <section aria-label="En çok okunanlar">
             <SectionHeading title="En Çok Okunanlar" />
             <ol>
-              {mostRead.map((a, i) => (
+              {mostRead.filter(isEditorialArticle).slice(0, 6).map((a, i) => (
                 <li key={a.id} className="flex gap-3 border-b border-line py-3 last:border-0 dark:border-line-dark">
                   <span className="font-serif text-headline-l text-line dark:text-line-dark">{i + 1}</span>
                   <Link href={`/haber/${a.slug}`} className="line-clamp-2 text-headline-s hover:text-brand-red">
@@ -168,6 +165,7 @@ export default async function HomePage() {
             </ol>
           </section>
 
+          <FixturesWidget />
           {activePoll && <PollWidget poll={activePoll} />}
 
           <AdSlot placement="SIDEBAR" eager />

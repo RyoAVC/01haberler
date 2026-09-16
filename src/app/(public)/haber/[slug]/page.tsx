@@ -16,6 +16,7 @@ import { CommentForm } from "@/components/article/CommentForm";
 import { CommentList } from "@/components/article/CommentList";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { isModuleEnabled } from "@/server/services/moduleFlagsService";
+import { bodyWithoutDuplicateSummary } from "@/lib/utils/articleBody";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -72,7 +73,7 @@ export default async function ArticleDetailPage({ params }: Props) {
 
   const appUrl = process.env.APP_URL ?? "http://localhost:3000";
   const canonicalUrl = article.canonicalUrl || `${appUrl}/haber/${article.slug}`;
-  const [firstHalf, secondHalf] = splitForMidAd(article.contentHtml);
+  const [firstHalf, secondHalf] = splitForMidAd(bodyWithoutDuplicateSummary(article.contentHtml, article.excerpt));
 
   return (
     <div className="container-page py-6">
@@ -137,10 +138,10 @@ export default async function ArticleDetailPage({ params }: Props) {
 
           <AdSlot placement="ARTICLE_AFTER_LEAD" categorySlug={article.category.slug} eager />
 
-          <div
+          {firstHalf && <div
             className="prose prose-neutral mt-6 max-w-measure text-body dark:prose-invert"
             dangerouslySetInnerHTML={{ __html: firstHalf }}
-          />
+          />}
 
           {secondHalf && (
             <>

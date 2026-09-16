@@ -16,11 +16,13 @@ export async function AdSlot({
 
   const adsenseEnabled = process.env.ADSENSE_ENABLED === "true";
   const publisherId = process.env.ADSENSE_PUBLISHER_ID ?? "";
+  if (ad.provider === "ADSENSE" && (!adsenseEnabled || !publisherId || !ad.adUnitSlotId)) return null;
+  if (ad.provider === "MANUAL" && !ad.imageMedia?.url && !ad.headline?.trim()) return null;
 
   const visibilityClass = [
-    !ad.showOnMobile && "hidden sm:block",
-    !ad.showOnTablet && "sm:hidden lg:block",
-    !ad.showOnDesktop && "lg:hidden",
+    ad.showOnMobile ? "block" : "hidden",
+    ad.showOnTablet ? "sm:block" : "sm:hidden",
+    ad.showOnDesktop ? "lg:block" : "lg:hidden",
   ]
     .filter(Boolean)
     .join(" ");
