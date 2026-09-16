@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60">
+  <rect width="60" height="60" rx="8" fill="#C8102E"/>
+  <text x="30" y="40" font-family="system-ui, sans-serif" font-size="26" fill="#fff" text-anchor="middle" font-weight="bold">01</text>
+  <text x="72" y="40" font-family="system-ui, sans-serif" font-size="26" fill="#1E2124" font-weight="bold">Haberler</text>
+</svg>

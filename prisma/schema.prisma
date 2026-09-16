@@ -1,0 +1,613 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------- Enums ----------
+
+enum UserRole {
+  SUPER_ADMIN
+  EDITOR
+  AUTHOR
+}
+
+enum ArticleStatus {
+  FETCHED
+  PENDING_REVIEW
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum FeedType {
+  RSS
+  ATOM
+  API
+}
+
+enum FeedRunStatus {
+  NEVER_RUN
+  OK
+  ERROR
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+enum JobTrigger {
+  SCHEDULE
+  MANUAL
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+}
+
+enum MediaSource {
+  UPLOAD
+  REMOTE_ALLOWLISTED
+  PLACEHOLDER
+}
+
+enum AdProvider {
+  ADSENSE
+  GOOGLE_AD_MANAGER
+  MANUAL
+}
+
+enum AdPlacement {
+  HEADER_BELOW
+  HOME_BELOW_HERO
+  IN_FEED
+  ARTICLE_AFTER_LEAD
+  ARTICLE_MID_BODY
+  ARTICLE_END
+  SIDEBAR
+  FOOTER_ABOVE
+  STICKY_BOTTOM
+}
+
+enum SourceDeleteAction {
+  KEEP_ARTICLES
+  ARCHIVE_ARTICLES
+  DELETE_ARTICLES
+}
+
+enum BannedWordSeverity {
+  BLOCK
+  FLAG
+}
+
+enum ReleaseChangeType {
+  FEATURE
+  FIX
+  IMPROVEMENT
+  SECURITY
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SPAM
+}
+
+enum SocialPlatform {
+  X
+  FACEBOOK
+  TELEGRAM
+}
+
+// ---------- Kullanicilar / Yetkilendirme ----------
+
+model User {
+  id                String            @id @default(cuid())
+  email             String            @unique
+  passwordHash      String
+  name              String
+  role              UserRole          @default(AUTHOR)
+  isActive          Boolean           @default(true)
+  lastLoginAt       DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  sessions          Session[]
+  authorProfile     Author?
+  revisions         ArticleRevision[]
+  auditLogs         AuditLog[]
+  uploadedMedia     Media[]
+  updatedSettings   SiteSetting[]
+  releaseNotes      ReleaseNote[]
+  moderatedComments Comment[]
+  polls             Poll[]
+
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  userAgent String?
+  ipHash    String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ---------- Icerik Taksonomisi ----------
+
+model Category {
+  id             String     @id @default(cuid())
+  name           String
+  slug           String     @unique
+  description    String?
+  parentId       String?
+  parent         Category?  @relation("CategoryToParent", fields: [parentId], references: [id])
+  children       Category[] @relation("CategoryToParent")
+  sortOrder      Int        @default(0)
+  isActive       Boolean    @default(true)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  articles       Article[]
+  feeds          Feed[]
+  sources        Source[]
+
+  @@index([parentId])
+}
+
+model Tag {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String       @unique
+  createdAt DateTime     @default(now())
+  articles  ArticleTag[]
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+}
+
+model Author {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  bio           String?
+  avatarMediaId String?
+  avatarMedia   Media?    @relation(fields: [avatarMediaId], references: [id])
+  userId        String?   @unique
+  user          User?     @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  articles      Article[]
+}
+
+// ---------- Kaynaklar / Bot Altyapisi ----------
+
+model Source {
+  id                      String             @id @default(cuid())
+  name                    String
+  slug                    String             @unique
+  homepageUrl             String
+  description             String?
+  logoMediaId             String?
+  logoMedia               Media?             @relation(fields: [logoMediaId], references: [id])
+  licenseNote             String
+  isTrustedForAutoPublish Boolean            @default(false)
+  defaultCategoryId       String?
+  defaultCategory         Category?          @relation(fields: [defaultCategoryId], references: [id])
+  onDeleteAction          SourceDeleteAction @default(KEEP_ARTICLES)
+  isActive                Boolean            @default(true)
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  feeds                   Feed[]
+  articles                Article[]
+}
+
+model Feed {
+  id                   String         @id @default(cuid())
+  sourceId             String
+  source               Source         @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  url                  String         @unique
+  type                 FeedType       @default(RSS)
+  categoryId           String?
+  category             Category?      @relation(fields: [categoryId], references: [id])
+  fetchIntervalMinutes Int            @default(15)
+  isActive             Boolean        @default(true)
+  lastFetchedAt        DateTime?
+  lastSuccessAt        DateTime?
+  lastStatus           FeedRunStatus  @default(NEVER_RUN)
+  consecutiveFailures  Int            @default(0)
+  lastErrorMessage     String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  jobs                 IngestionJob[]
+  articles             Article[]
+
+  @@index([sourceId])
+  @@index([isActive])
+}
+
+model IngestionJob {
+  id                    String         @id @default(cuid())
+  feedId                String
+  feed                  Feed           @relation(fields: [feedId], references: [id], onDelete: Cascade)
+  status                JobStatus      @default(PENDING)
+  triggeredBy           JobTrigger     @default(SCHEDULE)
+  startedAt             DateTime?
+  finishedAt            DateTime?
+  itemsFound            Int            @default(0)
+  itemsCreated          Int            @default(0)
+  itemsSkippedDuplicate Int            @default(0)
+  errorMessage          String?
+  createdAt             DateTime       @default(now())
+  logs                  IngestionLog[]
+
+  @@index([feedId])
+  @@index([status])
+}
+
+model IngestionLog {
+  id        String       @id @default(cuid())
+  jobId     String
+  job       IngestionJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  level     LogLevel     @default(INFO)
+  message   String
+  meta      Json?
+  createdAt DateTime     @default(now())
+
+  @@index([jobId])
+}
+
+// ---------- Medya ----------
+
+model Media {
+  id               String      @id @default(cuid())
+  url              String
+  originalFilename String?
+  mimeType         String
+  sizeBytes        Int
+  width            Int?
+  height           Int?
+  altText          String?
+  source           MediaSource @default(UPLOAD)
+  uploadedById     String?
+  uploadedBy       User?       @relation(fields: [uploadedById], references: [id])
+  createdAt        DateTime    @default(now())
+
+  authors        Author[]
+  sourceLogos    Source[]
+  articlesCover  Article[]       @relation("ArticleCoverMedia")
+  articlesOg     Article[]       @relation("ArticleOgMedia")
+  advertisements Advertisement[]
+}
+
+// ---------- Haberler ----------
+
+model Article {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  excerpt     String
+  contentHtml String
+  status      ArticleStatus @default(DRAFT)
+
+  categoryId String
+  category   Category     @relation(fields: [categoryId], references: [id])
+  tags       ArticleTag[]
+
+  authorId String?
+  author   Author? @relation(fields: [authorId], references: [id])
+
+  sourceId          String?
+  source            Source? @relation(fields: [sourceId], references: [id])
+  feedId            String?
+  feed              Feed?   @relation(fields: [feedId], references: [id])
+  sourceUrl         String? @unique
+  sourceDisplayName String?
+  contentHash       String?
+
+  coverMediaId  String?
+  coverMedia    Media?  @relation("ArticleCoverMedia", fields: [coverMediaId], references: [id])
+  coverImageAlt String?
+  ogMediaId     String?
+  ogMedia       Media?  @relation("ArticleOgMedia", fields: [ogMediaId], references: [id])
+
+  isBreaking       Boolean   @default(false)
+  breakingStartAt  DateTime?
+  breakingEndAt    DateTime?
+  breakingPriority Int       @default(0)
+  isFeatured       Boolean   @default(false)
+  isEditorsPick    Boolean   @default(false)
+
+  metaTitle       String?
+  metaDescription String?
+  canonicalUrl    String?
+
+  readingTimeMinutes Int @default(1)
+  viewCount          Int @default(0)
+
+  publishedAt DateTime?
+  scheduledAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  revisions   ArticleRevision[]
+  comments    Comment[]
+  socialPosts SocialPostLog[]
+
+  @@index([status])
+  @@index([categoryId])
+  @@index([publishedAt])
+  @@index([isBreaking])
+  @@index([contentHash])
+}
+
+model ArticleRevision {
+  id          String   @id @default(cuid())
+  articleId   String
+  article     Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  title       String
+  excerpt     String
+  contentHtml String
+  editedById  String?
+  editedBy    User?    @relation(fields: [editedById], references: [id])
+  changeNote  String?
+  createdAt   DateTime @default(now())
+
+  @@index([articleId])
+}
+
+// ---------- Reklam ----------
+
+model Advertisement {
+  id              String      @id @default(cuid())
+  name            String
+  slotKey         String      @unique
+  provider        AdProvider
+  placement       AdPlacement
+  publisherId     String?
+  adUnitSlotId    String?
+  isResponsive    Boolean     @default(true)
+  width           Int?
+  height          Int?
+  targetUrl       String?
+  imageMediaId    String?
+  imageMedia      Media?      @relation(fields: [imageMediaId], references: [id])
+  headline        String?
+  showOnDesktop   Boolean     @default(true)
+  showOnTablet    Boolean     @default(true)
+  showOnMobile    Boolean     @default(true)
+  categoryScope   String?
+  startAt         DateTime?
+  endAt           DateTime?
+  priority        Int         @default(0)
+  isActive        Boolean     @default(false)
+  impressionCount Int         @default(0)
+  clickCount      Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([placement, isActive])
+}
+
+// ---------- Site Yonetimi ----------
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  updatedById String?
+  updatedBy   User?    @relation(fields: [updatedById], references: [id])
+  updatedAt   DateTime @updatedAt
+}
+
+model Redirect {
+  id         String   @id @default(cuid())
+  fromPath   String   @unique
+  toPath     String
+  statusCode Int      @default(301)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ipHash     String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType, entityId])
+}
+
+model DailyStat {
+  id        String   @id @default(cuid())
+  date      DateTime @unique
+  viewCount Int      @default(0)
+
+  @@index([date])
+}
+
+model BannedWord {
+  id        String             @id @default(cuid())
+  word      String             @unique
+  severity  BannedWordSeverity @default(FLAG)
+  createdAt DateTime           @default(now())
+}
+
+// ---------- Surum / Degisiklik Gunlugu ----------
+
+model ReleaseNote {
+  id          String            @id @default(cuid())
+  version     String            @unique
+  title       String
+  releasedAt  DateTime          @default(now())
+  isDraft     Boolean           @default(false)
+  createdById String?
+  createdBy   User?             @relation(fields: [createdById], references: [id])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  items       ReleaseNoteItem[]
+
+  @@index([releasedAt])
+}
+
+model ReleaseNoteItem {
+  id            String            @id @default(cuid())
+  releaseNoteId String
+  releaseNote   ReleaseNote       @relation(fields: [releaseNoteId], references: [id], onDelete: Cascade)
+  changeType    ReleaseChangeType @default(FEATURE)
+  description   String
+  sortOrder     Int               @default(0)
+
+  @@index([releaseNoteId])
+}
+
+// ---------- Lisans (pasif altyapi) ----------
+
+model License {
+  id             String    @id @default(cuid())
+  licenseKey     String    @unique
+  ownerLegalName String
+  productName    String    @default("AvcHaberSoft")
+  issuedTo       String?
+  domain         String?
+  startAt        DateTime?
+  endAt          DateTime?
+  isActive       Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// ---------- Yorumlar ----------
+
+model Comment {
+  id            String        @id @default(cuid())
+  articleId     String
+  article       Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  parentId      String?
+  parent        Comment?      @relation("CommentToParent", fields: [parentId], references: [id])
+  replies       Comment[]     @relation("CommentToParent")
+  authorName    String
+  authorEmail   String
+  body          String
+  status        CommentStatus @default(PENDING)
+  ipHash        String?
+  moderatedById String?
+  moderatedBy   User?         @relation(fields: [moderatedById], references: [id])
+  moderatedAt   DateTime?
+  createdAt     DateTime      @default(now())
+
+  @@index([articleId, status])
+  @@index([status])
+}
+
+// ---------- Anketler ----------
+
+model Poll {
+  id          String       @id @default(cuid())
+  question    String
+  slug        String       @unique
+  isActive    Boolean      @default(true)
+  startAt     DateTime?
+  endAt       DateTime?
+  createdById String?
+  createdBy   User?        @relation(fields: [createdById], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  options     PollOption[]
+  votes       PollVote[]
+
+  @@index([isActive])
+}
+
+model PollOption {
+  id        String     @id @default(cuid())
+  pollId    String
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  label     String
+  sortOrder Int        @default(0)
+  votes     PollVote[]
+
+  @@index([pollId])
+}
+
+model PollVote {
+  id        String     @id @default(cuid())
+  pollId    String
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  optionId  String
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  ipHash    String
+  createdAt DateTime   @default(now())
+
+  @@unique([pollId, ipHash])
+  @@index([optionId])
+}
+
+// ---------- Push Bildirimleri ----------
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+// ---------- Sosyal Medya Otomasyonu ----------
+
+model SocialAutoPostConfig {
+  id              String         @id @default(cuid())
+  platform        SocialPlatform @unique
+  isActive        Boolean        @default(false)
+  accessToken     String?
+  accountRef      String?
+  messageTemplate String         @default("{{title}} {{url}}")
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model SocialPostLog {
+  id           String         @id @default(cuid())
+  articleId    String
+  article      Article        @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  platform     SocialPlatform
+  status       JobStatus
+  externalId   String?
+  errorMessage String?
+  createdAt    DateTime       @default(now())
+
+  @@index([articleId])
+  @@index([platform, status])
+}

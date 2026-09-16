@@ -1,0 +1,34 @@
+import type { MetadataRoute } from "next";
+import { prisma } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
+
+  const [articles, categories] = await Promise.all([
+    prisma.article.findMany({
+      where: { status: "PUBLISHED", publishedAt: { lte: new Date() } },
+      orderBy: { publishedAt: "desc" },
+      take: 5000,
+      select: { slug: true, updatedAt: true },
+    }),
+    prisma.category.findMany({ where: { isActive: true }, select: { slug: true } }),
+  ]);
+
+  return [
+    { url: appUrl, changeFrequency: "always", priority: 1 },
+    { url: `${appUrl}/arama`, changeFrequency: "monthly", priority: 0.3 },
+    ...categories.map((c) => ({
+      url: `${appUrl}/kategori/${c.slug}`,
+      changeFrequency: "hourly" as const,
+      priority: 0.7,
+    })),
+    ...articles.map((a) => ({
+      url: `${appUrl}/haber/${a.slug}`,
+      lastModified: a.updatedAt,
+      changeFrequency: "daily" as const,
+      priority: 0.6,
+    })),
+  ];
+}
