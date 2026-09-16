@@ -10,6 +10,7 @@ import { LinkIcon } from "@/components/ui/Icons";
 interface Props {
   name: string;
   initialContent?: string;
+  onContentChange?: (html: string) => void;
 }
 
 function ToolbarButton({
@@ -38,7 +39,7 @@ function ToolbarButton({
   );
 }
 
-export function RichTextEditor({ name, initialContent = "" }: Props) {
+export function RichTextEditor({ name, initialContent = "", onContentChange }: Props) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -55,6 +56,10 @@ export function RichTextEditor({ name, initialContent = "" }: Props) {
     content: initialContent,
     editorProps: {
       attributes: {
+        id: `${name}-editor`,
+        role: "textbox",
+        "aria-label": "Haber içeriği",
+        "aria-multiline": "true",
         class:
           "prose prose-neutral min-h-[280px] max-w-none border border-line border-t-0 px-3 py-3 text-body focus:outline-none dark:border-line-dark dark:prose-invert",
       },
@@ -69,12 +74,13 @@ export function RichTextEditor({ name, initialContent = "" }: Props) {
 
     const handleUpdate = () => {
       if (hiddenInput) hiddenInput.value = editor.getHTML();
+      onContentChange?.(editor.getHTML());
     };
     editor.on("update", handleUpdate);
     return () => {
       editor.off("update", handleUpdate);
     };
-  }, [editor, name]);
+  }, [editor, name, onContentChange]);
 
   if (!editor) {
     return <div className="min-h-[320px] border border-line dark:border-line-dark" />;

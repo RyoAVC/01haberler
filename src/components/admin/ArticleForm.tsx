@@ -4,6 +4,7 @@ import { useState } from "react";
 import { saveArticle } from "@/server/actions/articleActions";
 import { suggestExcerptAction, suggestSeoMetaAction } from "@/server/actions/aiEditorActions";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { ArticleQualityPanel } from "@/components/admin/ArticleQualityPanel";
 
 interface Option {
   id: string;
@@ -52,6 +53,9 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
   const [error, setError] = useState<string | null>(null);
   const [isBreaking, setIsBreaking] = useState(article?.isBreaking ?? false);
   const [title, setTitle] = useState(article?.title ?? "");
+  const [contentHtml, setContentHtml] = useState(article?.contentHtml ?? "");
+  const [categoryId, setCategoryId] = useState(article?.categoryId ?? "");
+  const [coverImageAlt, setCoverImageAlt] = useState(article?.coverImageAlt ?? "");
   const [excerpt, setExcerpt] = useState(article?.excerpt ?? "");
   const [metaTitle, setMetaTitle] = useState(article?.metaTitle ?? "");
   const [metaDescription, setMetaDescription] = useState(article?.metaDescription ?? "");
@@ -111,6 +115,7 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
   return (
     <form action={handleSubmit} className="max-w-3xl space-y-6">
       {error && <p role="alert" className="border border-brand-red px-3 py-2 text-headline-s text-brand-red">{error}</p>}
+      <ArticleQualityPanel value={{ title, excerpt, contentHtml, categoryId, coverMediaId, coverImageAlt, metaTitle, metaDescription }} />
 
       <div>
         <label htmlFor="title" className="block text-headline-s">Başlık</label>
@@ -155,7 +160,7 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
           İçerik <span className="text-caption text-ink-secondary">— kaydedilirken otomatik olarak temizlenir</span>
         </label>
         <div className="mt-1">
-          <RichTextEditor name="contentHtml" initialContent={article?.contentHtml} />
+          <RichTextEditor name="contentHtml" initialContent={article?.contentHtml} onContentChange={setContentHtml} />
         </div>
       </div>
 
@@ -175,7 +180,8 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
         <input
           id="coverImageAlt"
           name="coverImageAlt"
-          defaultValue={article?.coverImageAlt ?? ""}
+          value={coverImageAlt}
+          onChange={(e) => setCoverImageAlt(e.target.value)}
           className="mt-1 w-full border border-line bg-transparent px-3 py-2 dark:border-line-dark"
         />
       </div>
@@ -187,7 +193,8 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
             id="categoryId"
             name="categoryId"
             required
-            defaultValue={article?.categoryId}
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
             className="mt-1 w-full border border-line bg-transparent px-3 py-2 dark:border-line-dark"
           >
             <option value="">Seçin</option>

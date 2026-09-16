@@ -4,6 +4,15 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.3.0 — 2026-09-17
+
+- Haber düzenleyicide yazdıkça güncellenen yayın kalite kontrolü.
+- Başlık/spot sınırları, boş gövde, spot tekrarı, kategori, kapak ve alt metin uyarıları.
+- SEO alanlarının uzunluk kontrolü; isteğe bağlı boş alanlar uyarı oluşturmaz.
+- Kelime/başlık sayacı ve uyarıdan ilgili alana klavyeyle erişilebilir geçiş.
+- Uyarılar editöre yardımcıdır; doğruluk onayı veya yeni yayın engeli değildir.
+- 50 birim testi, TypeScript ve ESLint kontrolleri.
+
 ## 1.2.0 — 2026-09-17
 
 - Aramaya kategori, başlangıç/bitiş günü ve en yeni/en eski/en çok okunan sıralaması eklendi.
