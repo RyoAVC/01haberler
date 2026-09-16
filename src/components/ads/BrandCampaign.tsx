@@ -1,9 +1,10 @@
 export function BrandCampaign({ brand, compact = false }: { brand: "avci" | "adana"; compact?: boolean }) {
   const avci = brand === "avci";
+  if (avci && compact) return <aside aria-label="Avcı E-Ticaret reklamı" className="brand-campaign campaign-avci campaign-compact campaign-avci-gif"><a href="https://avcieticaret.com" target="_blank" rel="noopener noreferrer sponsored" className="campaign-gif-link"><img src="/images/avci-eticaret-banner.gif" alt="Avcı E-Ticaret — 2026'nın yeni nesil e-ticaret altyapısı" /><span className="campaign-disclosure">REKLAM</span></a></aside>;
   return <aside aria-label={`${avci ? "Avcı E-Ticaret" : "Adana360"} reklamı`} className={`brand-campaign ${avci ? "campaign-avci" : "campaign-adana"} ${compact ? "campaign-compact" : ""}`}>
     <span className="campaign-disclosure">REKLAM</span>
     <a href={avci ? "https://avcieticaret.com" : "https://adana360.com"} target="_blank" rel="noopener noreferrer sponsored" className="campaign-link">
-      <span className="campaign-brand">{avci ? <>AVCI<span>E-TİCARET</span></> : <>adana<span className="campaign-360">360°</span></>}</span>
+      <span className="campaign-brand">{avci ? <><img src="/images/avci-eticaret-logo.webp" alt="Avcı E-Ticaret" /><span>E-TİCARET</span></> : <>adana<span className="campaign-360">360°</span></>}</span>
       <span className="campaign-art" aria-hidden="true">{avci ? <><i /><i /><i /><b>↗</b></> : <><i /><i /><i /><b>01</b></>}</span>
       <strong className="campaign-title">{avci ? <>Yeni bir<br />keşfe çık.</> : <>Şehre başka<br />bir açıdan bak.</>}</strong>
       <span className="campaign-caption">{avci ? "Avcı E-Ticaret dünyasını keşfet." : "Adana360 ile şehri keşfet."}</span>

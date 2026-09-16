@@ -6,6 +6,12 @@ Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gös
 
 ## 1.7.0 — 2026-09-17
 
+## 1.8.0 — 2026-09-17
+
+- Avcı E-Ticaret bannerları gerçek marka logo ve banner varlıklarıyla yenilendi.
+- Kompakt ana sayfa reklamında verilen animasyonlu GIF kullanılıyor; masaüstü railinde logo korunuyor.
+- Avcı CTA hedefi `https://avcieticaret.com` olarak korunuyor; reklam etiketi ve sponsor bağlantı niteliği sürüyor.
+
 - Sekmeye ve kullanıcıya özel geçici metin kurtarma: başlık, spot, gövde ve SEO metinleri; elle geri alma, 24 saatlik geçerlilik ve başarılı kayıtta temizleme.
 - Editörde metin önizlemesi; beklenmedik kayıt hatasında metni koruyan açıklayıcı hata.
 - Haber kartlarında görselsiz içerik için tipografik düzen; büyük boş görsel alanı kaldırıldı.
