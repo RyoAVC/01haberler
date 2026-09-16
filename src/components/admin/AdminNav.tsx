@@ -15,6 +15,7 @@ const NAV_GROUPS = [
     items: [
       { href: "/admin/haberler", label: "Haberler" },
       { href: "/admin/vitrin", label: "Ana Sayfa Vitrini" },
+      { href: "/admin/medya", label: "Medya Merkezi" },
       { href: "/admin/kategoriler", label: "Kategoriler" },
       { href: "/admin/etiketler", label: "Etiketler" },
       { href: "/admin/yorumlar", label: "Yorumlar" },

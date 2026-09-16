@@ -4,6 +4,15 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.6.0 — 2026-09-17
+
+- Medya Merkezi: dosya adı/alternatif metin araması, sayfalama, dosya ve kullanım bilgileri.
+- Alternatif metin, fotoğrafçı/kaynak ve editöre özel kullanım hakkı notlarının denetim kaydıyla güncellenmesi.
+- Haber editöründe mevcut görsel seçici ve gerçek kapak önizlemesi; aynı dosyayı tekrar yükleme ihtiyacı azaltıldı.
+- Yazarların medya listesi ve değişiklikleri kendi yükledikleriyle sınırlı; editörler tüm kütüphaneyi yönetebilir.
+- Kayıt hatası/çakışmasından sonra form alanları sıfırlanmıyor; kayıt ve yükleme sırasında yinelenen gönderim engelleniyor.
+- Görsel yüklemede ağ hatası anlaşılır gösteriliyor ve yükleniyor durumu temizleniyor.
+
 ## 1.5.0 — 2026-09-17
 
 - Türkiye saatiyle zamanlı yayın; geçersiz/geçmiş zaman kontrolü ve mevcut programın editörde gösterimi.

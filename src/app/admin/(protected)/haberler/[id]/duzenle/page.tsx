@@ -23,7 +23,7 @@ export default async function EditArticlePage({ params, searchParams }: Props) {
   const [article, categories, tags, authors] = await Promise.all([
     prisma.article.findUnique({
       where: { id },
-      include: { tags: { select: { tagId: true } } },
+      include: { tags: { select: { tagId: true } }, coverMedia: { select: { url: true } } },
     }),
     prisma.category.findMany({ where: { isActive: true }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.tag.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
@@ -51,6 +51,7 @@ export default async function EditArticlePage({ params, searchParams }: Props) {
           categoryId: article.categoryId,
           authorId: article.authorId,
           coverMediaId: article.coverMediaId,
+          coverMediaUrl: article.coverMedia?.url,
           coverImageAlt: article.coverImageAlt,
           metaTitle: article.metaTitle,
           metaDescription: article.metaDescription,

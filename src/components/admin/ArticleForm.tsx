@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import { MediaPicker } from "@/components/admin/MediaPicker";
 import { saveArticle } from "@/server/actions/articleActions";
 import { suggestExcerptAction, suggestSeoMetaAction } from "@/server/actions/aiEditorActions";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
@@ -19,6 +21,7 @@ interface ExistingArticle {
   categoryId: string;
   authorId: string | null;
   coverMediaId: string | null;
+  coverMediaUrl?: string | null;
   coverImageAlt: string | null;
   metaTitle: string | null;
   metaDescription: string | null;
@@ -50,10 +53,11 @@ const STATUS_OPTIONS = [
 
 export function ArticleForm({ categories, tags, authors, canPublish, article, aiEditorEnabled = false }: Props) {
   const [coverMediaId, setCoverMediaId] = useState(article?.coverMediaId ?? "");
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(article?.coverMediaUrl ?? null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const [isBreaking, setIsBreaking] = useState(article?.isBreaking ?? false);
   const [title, setTitle] = useState(article?.title ?? "");
   const [contentHtml, setContentHtml] = useState(article?.contentHtml ?? "");
@@ -99,24 +103,25 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
     setUploadError(null);
     const formData = new FormData();
     formData.append("file", file);
-    const res = await fetch("/api/admin/media/upload", { method: "POST", body: formData });
-    const data = await res.json();
-    setUploading(false);
-    if (!res.ok) {
-      setUploadError(data.error ?? "Yükleme başarısız");
-      return;
-    }
-    setCoverMediaId(data.id);
-    setCoverPreview(data.url);
+    try {
+      const res = await fetch("/api/admin/media/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) { setUploadError(data.error ?? "Yükleme başarısız"); return; }
+      setCoverMediaId(data.id); setCoverPreview(data.url);
+    } catch { setUploadError("Görsel yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin."); }
+    finally { setUploading(false); }
   }
 
   async function handleSubmit(formData: FormData) {
-    const result = await saveArticle(article?.id ?? null, formData);
-    if (result?.error) setError(result.error);
+    setSaving(true); setError(null);
+    try {
+      const result = await saveArticle(article?.id ?? null, formData);
+      if (result?.error) setError(result.error);
+    } finally { setSaving(false); }
   }
 
   return (
-    <form action={handleSubmit} className="max-w-3xl space-y-6">
+    <form onSubmit={event => { event.preventDefault(); if (!saving) void handleSubmit(new FormData(event.currentTarget)); }} className="max-w-3xl space-y-6">
       {article && <input type="hidden" name="expectedUpdatedAt" value={article.updatedAt ?? ""} />}
       {error && <p role="alert" className="border border-brand-red px-3 py-2 text-headline-s text-brand-red">{error}</p>}
       <ArticleQualityPanel value={{ title, excerpt, contentHtml, categoryId, coverMediaId, coverImageAlt, metaTitle, metaDescription }} />
@@ -177,6 +182,8 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
           <p className="mt-1 text-caption text-ink-secondary dark:text-ink-dark-secondary">Görsel seçildi.</p>
         )}
         <input type="hidden" name="coverMediaId" value={coverMediaId} />
+        {coverPreview && <Image src={coverPreview} alt={coverImageAlt || "Seçilen kapak"} width={600} height={340} unoptimized className="mt-3 max-h-52 w-full rounded object-contain" />}
+        <MediaPicker onSelect={media => { setCoverMediaId(media.id); setCoverPreview(media.url); setCoverImageAlt(media.altText ?? ""); }} />
       </div>
 
       <div>
@@ -304,8 +311,8 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
         </label>
       </div>
 
-      <button type="submit" className="bg-brand-red px-6 py-2.5 text-headline-s text-white hover:bg-brand-red-dark">
-        Kaydet
+      <button type="submit" disabled={saving || uploading} className="bg-brand-red px-6 py-2.5 text-headline-s text-white hover:bg-brand-red-dark disabled:opacity-50">
+        {saving ? "Kaydediliyor…" : "Kaydet"}
       </button>
     </form>
   );
