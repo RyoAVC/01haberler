@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { formatDateTr } from "@/lib/utils/formatDate";
 import { approveArticle, rejectArticle, archiveArticle, bulkApproveArticles } from "@/server/actions/articleActions";
 import type { ArticleStatus } from "@prisma/client";
+import { Pagination } from "@/components/ui/Pagination";
 
 const STATUS_LABEL: Record<ArticleStatus, string> = {
   FETCHED: "Çekildi",
@@ -23,7 +24,8 @@ interface Props {
 export default async function AdminArticlesPage({ searchParams }: Props) {
   const { durum, sayfa } = await searchParams;
   const status = STATUS_OPTIONS.includes(durum as ArticleStatus) ? (durum as ArticleStatus) : undefined;
-  const page = Math.max(1, Number(sayfa) || 1);
+  const requestedPage = Number(sayfa ?? "1");
+  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 && requestedPage <= 100000 ? requestedPage : 1;
   const pageSize = 20;
 
   const [articles, total] = await Promise.all([
@@ -150,6 +152,7 @@ export default async function AdminArticlesPage({ searchParams }: Props) {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={Math.max(1, Math.ceil(total / pageSize))} basePath={status ? `/admin/haberler?durum=${status}` : "/admin/haberler"} />
     </div>
   );
 }

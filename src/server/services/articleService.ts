@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
+import { searchDateRange, type SearchFilters } from "@/lib/utils/searchFilters";
 
 export const PUBLIC_ARTICLE_CARD_SELECT = {
   id: true,
@@ -221,18 +222,25 @@ export async function getArticlesBySourceSlug(
 export async function searchArticles(
   query: string,
   page: number,
-  pageSize = 12
+  pageSize = 12,
+  filters: SearchFilters = {}
 ): Promise<{ items: ArticleCardData[]; total: number }> {
+  const { start, end } = searchDateRange(filters.from, filters.to);
   const where = publishedWhere({
-    OR: [
+    ...(query ? { OR: [
       { title: { contains: query, mode: "insensitive" } },
       { excerpt: { contains: query, mode: "insensitive" } },
-    ],
+    ] } : {}),
+    ...(filters.category ? { category: { slug: filters.category } } : {}),
+    publishedAt: { lte: new Date(), ...(start ? { gte: start } : {}), ...(end ? { lt: end } : {}) },
   });
+  const orderBy: Prisma.ArticleOrderByWithRelationInput[] = filters.sort === "popular"
+    ? [{ viewCount: "desc" }, { publishedAt: "desc" }, { id: "desc" }]
+    : [{ publishedAt: filters.sort === "oldest" ? "asc" : "desc" }, { id: "desc" }];
   const [items, total] = await Promise.all([
     prisma.article.findMany({
       where,
-      orderBy: { publishedAt: "desc" },
+      orderBy,
       skip: (page - 1) * pageSize,
       take: pageSize,
       select: PUBLIC_ARTICLE_CARD_SELECT,

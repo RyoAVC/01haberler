@@ -92,16 +92,30 @@ export async function toggleSourceAutoPublish(sourceId: string, isTrustedForAuto
 export async function runFeedNow(formData: FormData) {
   await requireSourceManager();
   const feedId = String(formData.get("feedId") ?? "");
-  const categoryId = (formData.get("categoryId") as string) || null;
   if (!feedId) throw new Error("Feed bulunamadı");
 
-  if (categoryId) {
-    await prisma.feed.update({ where: { id: feedId }, data: { categoryId } });
-  }
+  if (formData.has("categoryId")) await saveFeedCategory(formData);
 
   await runIngestionJob(feedId, "MANUAL");
   revalidatePath("/admin/kaynaklar");
   revalidatePath("/admin/haberler");
+}
+
+export async function saveFeedCategory(formData: FormData): Promise<void> {
+  const user = await requireSourceManager();
+  const feedId = String(formData.get("feedId") ?? "").trim();
+  const categoryId = String(formData.get("categoryId") ?? "").trim() || null;
+  if (!feedId) throw new Error("Feed bulunamadı");
+  if (categoryId && !await prisma.category.findFirst({ where: { id: categoryId, isActive: true }, select: { id: true } })) {
+    throw new Error("Aktif bir kategori seçin");
+  }
+  await prisma.$transaction(async tx => {
+    const before = await tx.feed.findUniqueOrThrow({ where: { id: feedId }, select: { categoryId: true } });
+    await tx.feed.update({ where: { id: feedId }, data: { categoryId } });
+    await tx.auditLog.create({ data: { userId: user.id, action: "FEED_CATEGORY_UPDATE", entityType: "Feed", entityId: feedId,
+      metadata: { previousCategoryId: before.categoryId, categoryId } } });
+  });
+  revalidatePath("/admin/kaynaklar");
 }
 
 export async function runAllActiveFeedsNow() {

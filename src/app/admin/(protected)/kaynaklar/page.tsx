@@ -9,6 +9,7 @@ import {
   toggleSourceAutoPublish,
   runFeedNow,
   runAllActiveFeedsNow,
+  saveFeedCategory,
 } from "@/server/actions/sourceActions";
 
 export default async function AdminSourcesPage() {
@@ -74,17 +75,19 @@ export default async function AdminSourcesPage() {
                   <td className="py-2 pr-4 text-caption">{feed.lastFetchedAt ? formatDateTr(feed.lastFetchedAt) : "—"}</td>
                   <td className="py-2 pr-4">
                     <div className="flex flex-wrap items-center gap-3">
-                      <form action={runFeedNow} className="flex items-center gap-2">
+                      <form action={saveFeedCategory} className="flex flex-wrap items-center gap-2">
                         <input type="hidden" name="feedId" value={feed.id} />
                         <select
                           name="categoryId"
+                          aria-label={`${source.name} akış kategorisi`}
                           defaultValue={feed.categoryId ?? ""}
                           className="border border-line bg-transparent px-2 py-1 text-caption dark:border-line-dark"
                         >
                           <option value="">Kaynak varsayılanı</option>
                           {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
-                        <button type="submit" className="text-brand-red hover:underline">Çek</button>
+                        <button type="submit" className="text-brand-red hover:underline">Kategoriyi Kaydet</button>
+                        <button type="submit" formAction={runFeedNow} className="hover:underline">Kaydet ve Çek</button>
                       </form>
                       <form action={toggleFeedActive.bind(null, feed.id, !feed.isActive)}>
                         <button type="submit" className="hover:underline">{feed.isActive ? "Devre Dışı Bırak" : "Etkinleştir"}</button>
@@ -98,6 +101,7 @@ export default async function AdminSourcesPage() {
               )}
             </tbody>
           </table>
+          <p className="mt-3 text-caption text-ink-secondary dark:text-ink-dark-secondary">Kategori eşleştirmesini kaydetmek haber çekmez. Seçim sonraki alınacak haberler için geçerlidir; mevcut haberlerin kategorisini değiştirmez.</p>
 
           <details className="mt-4">
             <summary className="cursor-pointer text-headline-s text-brand-red">+ Feed Ekle</summary>
