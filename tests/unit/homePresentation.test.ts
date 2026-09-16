@@ -21,6 +21,7 @@ vi.mock("@/server/services/articleService", () => ({
 }));
 vi.mock("@/lib/db", () => ({ prisma: { category: { findUnique: async () => null } } }));
 vi.mock("@/server/services/moduleFlagsService", () => ({ isModuleEnabled: async () => false }));
+vi.mock("@/server/services/homeSettingsService", () => ({ getHomeSettings: async () => ({ headlineIds: [], campaignsEnabled: true }) }));
 vi.mock("@/server/services/pollService", () => ({ getActivePoll: async () => null }));
 vi.mock("@/components/ads/AdSlot", () => ({ AdSlot: () => null }));
 vi.mock("@/components/widgets/PollWidget", () => ({ PollWidget: () => null }));

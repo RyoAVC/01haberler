@@ -2,7 +2,12 @@ import Link from "next/link";
 import { HeroCard } from "@/components/article/HeroCard";
 import { LatestNewsTicker } from "@/components/layout/LatestNewsTicker";
 import { FixturesWidget } from "@/components/widgets/FixturesWidget";
-import { SecondaryHeadline } from "@/components/article/SecondaryHeadline";
+import { HomeHeadline } from "@/components/home/HomeHeadline";
+import { BrandCampaign } from "@/components/ads/BrandCampaign";
+import { MarketBoard } from "@/components/widgets/MarketBoard";
+import { getMarketSnapshot } from "@/server/services/marketService";
+import { getHomeSettings } from "@/server/services/homeSettingsService";
+import { PUBLIC_ARTICLE_CARD_SELECT } from "@/server/services/articleService";
 import { CompactListItem } from "@/components/article/CompactListItem";
 import { SideImageItem } from "@/components/article/SideImageItem";
 import { GalleryCard } from "@/components/article/GalleryCard";
@@ -18,7 +23,7 @@ import {
 import { getActivePoll } from "@/server/services/pollService";
 import { isModuleEnabled } from "@/server/services/moduleFlagsService";
 import { prisma } from "@/lib/db";
-import { isEditorialArticle, selectHeadlines } from "@/lib/utils/headlines";
+import { isEditorialArticle, selectHeadlines, selectPinnedHeadlines } from "@/lib/utils/headlines";
 
 export const dynamic = "force-dynamic";
 
@@ -53,33 +58,44 @@ export default async function HomePage() {
 
   const activePoll = pollsEnabled ? await getActivePoll() : null;
 
-  const heroArticles = selectHeadlines(featured, latest);
+  const homeSettings = await getHomeSettings();
+  const pinned = homeSettings.headlineIds.length ? await prisma.article.findMany({ where: { id: { in: homeSettings.headlineIds }, status: "PUBLISHED", publishedAt: { lte: new Date() } }, select: PUBLIC_ARTICLE_CARD_SELECT }) : [];
+  pinned.sort((a, b) => homeSettings.headlineIds.indexOf(a.id) - homeSettings.headlineIds.indexOf(b.id));
+  const heroArticles = selectPinnedHeadlines(homeSettings.headlineIds, pinned, selectHeadlines(featured, latest, 10));
   const mainHero = heroArticles[0];
-  const secondaryHero = heroArticles.slice(1, 4);
+  const secondaryHero = heroArticles.slice(1, 3);
+  const market = await isModuleEnabled("currency") ? await getMarketSnapshot() : null;
 
   return (
-    <div className="container-page py-6">
+    <div className="home-stage">
+    {homeSettings.campaignsEnabled && <><div className="home-rail home-rail-left"><BrandCampaign brand="avci" /></div>
+    <div className="home-rail home-rail-right"><BrandCampaign brand="adana" /></div></>}
+    <div className="container-page home-canvas py-6">
+      <div className="home-edition"><div><span className="eyebrow">01 HABERLER · GÜNÜN AKIŞI</span><h1>Gündemi yakından takip edin.</h1></div><Link href="/son-haberler">Tüm gelişmeler <span aria-hidden>↗</span></Link></div>
+      {market && <MarketBoard initial={market} />}
       <div className="mb-6">
         <LatestNewsTicker />
       </div>
 
       {mainHero && (
-        <section aria-label="Manşetler" className={`grid gap-8 pb-8 ${secondaryHero.length ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""}`}>
-          <HeroCard article={mainHero} />
-          {secondaryHero.length > 0 && <div className="flex flex-col gap-3">
-            {secondaryHero.map((a, i) => (
-              <SecondaryHeadline key={a.id} article={a} showRule={i > 0} />
+        <section aria-label="Manşetler" className={`home-headlines ${secondaryHero.length ? "has-secondary" : ""}`}>
+          <HomeHeadline article={mainHero} primary />
+          {secondaryHero.length > 0 && <div className="secondary-headlines">
+            {secondaryHero.map((a) => (
+              <HomeHeadline key={a.id} article={a} />
             ))}
           </div>}
         </section>
       )}
+
+      {homeSettings.campaignsEnabled && <div className="home-campaign-strip"><BrandCampaign brand="avci" compact /><BrandCampaign brand="adana" compact /></div>}
 
       <AdSlot placement="HOME_BELOW_HERO" eager />
 
       <div className="grid gap-10 py-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex flex-col gap-10">
           {gundem.length > 0 && (
-            <section aria-label="Gündem">
+            <section aria-label="Gündem" className="editorial-section">
               <SectionHeading title="Gündem" href="/kategori/gundem" />
               <ul>
                 {gundem.map((a) => (
@@ -90,7 +106,7 @@ export default async function HomePage() {
           )}
 
           {dunya.length > 0 && (
-            <section aria-label="Dünya">
+            <section aria-label="Dünya" className="editorial-section">
               <SectionHeading title="Dünya" href="/kategori/dunya" />
               <div>
                 {dunya.map((a) => (
@@ -103,7 +119,7 @@ export default async function HomePage() {
           <AdSlot placement="IN_FEED" />
 
           {ekonomi.length > 0 && (
-            <section aria-label="Ekonomi">
+            <section aria-label="Ekonomi" className="editorial-section">
               <SectionHeading title="Ekonomi" href="/kategori/ekonomi" />
               <ul>
                 {ekonomi.map((a) => (
@@ -151,7 +167,7 @@ export default async function HomePage() {
         </div>
 
         <aside className="flex flex-col gap-8">
-          <section aria-label="En çok okunanlar">
+          <section aria-label="En çok okunanlar" className="most-read-panel">
             <SectionHeading title="En Çok Okunanlar" />
             <ol>
               {mostRead.filter(isEditorialArticle).slice(0, 6).map((a, i) => (
@@ -171,6 +187,6 @@ export default async function HomePage() {
           <AdSlot placement="SIDEBAR" eager />
         </aside>
       </div>
-    </div>
+    </div></div>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AvcHaberSoftBrand } from "@/components/ui/BrandMark";
+import { useState } from "react";
 
 const NAV_GROUPS = [
   {
@@ -13,6 +14,7 @@ const NAV_GROUPS = [
     label: "İçerik",
     items: [
       { href: "/admin/haberler", label: "Haberler" },
+      { href: "/admin/vitrin", label: "Ana Sayfa Vitrini" },
       { href: "/admin/kategoriler", label: "Kategoriler" },
       { href: "/admin/etiketler", label: "Etiketler" },
       { href: "/admin/yorumlar", label: "Yorumlar" },
@@ -23,6 +25,7 @@ const NAV_GROUPS = [
     label: "Otomasyon",
     items: [
       { href: "/admin/kaynaklar", label: "Kaynaklar" },
+      { href: "/admin/operasyon", label: "Operasyon Merkezi" },
       { href: "/admin/bildirimler", label: "Bildirimler" },
       { href: "/admin/sosyal-otomasyon", label: "Sosyal Otomasyon" },
       { href: "/admin/yonlendirmeler", label: "Yönlendirmeler" },
@@ -46,6 +49,7 @@ const NAV_GROUPS = [
 export function AdminNav({ userName, userRole }: { userName: string; userRole: string }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   async function handleLogout() {
     await fetch("/api/admin/auth/logout", { method: "POST" });
@@ -61,7 +65,8 @@ export function AdminNav({ userName, userRole }: { userName: string; userRole: s
           {userName} · {userRole}
         </Link>
       </div>
-      <nav className="flex flex-col border-t border-line dark:border-line-dark">
+      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="admin-navigation" className="mx-4 mb-4 rounded border border-line px-4 py-2 text-caption md:hidden">{open ? "Menüyü kapat" : "Yönetim menüsünü aç"}</button>
+      <nav id="admin-navigation" className={`${open ? "flex" : "hidden"} flex-col border-t border-line dark:border-line-dark md:flex`}>
         {NAV_GROUPS.map((group) => (
           <div key={group.label || "root"}>
             {group.label && (
@@ -73,6 +78,7 @@ export function AdminNav({ userName, userRole }: { userName: string; userRole: s
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setOpen(false)}
                   className={`block border-l-2 px-4 py-2.5 text-headline-s transition-colors ${
                     active
                       ? "border-brand-red bg-brand-red/10 text-brand-red"

@@ -26,6 +26,7 @@ export function MobileMenu({ categories }: { categories: NavCategory[] }) {
       {open && (
         <nav className="absolute inset-x-0 top-full z-40 rule-bottom border-t bg-surface p-2 shadow-sm dark:bg-surface-dark">
           <ul>
+            <li className="border-b border-line dark:border-line-dark"><Link href="/okuma-listem" onClick={() => setOpen(false)} className="flex min-h-[44px] items-center px-2 text-headline-s">Okuma listem</Link></li>
             {categories.map((c) => (
               <li key={c.slug} className="border-b border-line last:border-0 dark:border-line-dark">
                 <Link

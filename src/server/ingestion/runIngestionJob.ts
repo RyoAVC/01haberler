@@ -11,6 +11,7 @@ import { autoEditForPublish } from "@/server/services/aiEditorService";
 import { findBannedWordMatches } from "@/server/services/bannedWordService";
 import { postArticleToSocialPlatforms, pingGoogleSitemap } from "@/server/services/socialPostService";
 import type { JobTrigger } from "@prisma/client";
+import { validSourceDate } from "@/lib/utils/sourceDate";
 
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 1000;
@@ -77,6 +78,7 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
       feed.source.isTrustedForAutoPublish && (await isModuleEnabled("aiAutoPublish"));
 
     for (const item of items) {
+      const sourceDate = validSourceDate(item.publishedAt);
       const dedupe = await checkDuplicate({
         link: item.link,
         title: item.title,
@@ -96,7 +98,7 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
       const safeExcerpt = item.excerpt || item.title;
 
       let autoEdit = null;
-      if (autoPublishEligible) {
+      if (autoPublishEligible && sourceDate) {
         autoEdit = await autoEditForPublish({
           title: item.title,
           excerptSource: safeExcerpt,
@@ -112,7 +114,6 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
       }
 
       const slug = await generateUniqueSlug(autoEdit?.title ?? item.title);
-      const now = new Date();
 
       const article = await prisma.article.create({
         data: {
@@ -121,7 +122,7 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
           excerpt: (autoEdit?.excerpt ?? safeExcerpt).slice(0, 500),
           contentHtml: sanitizeArticleHtml(autoEdit?.contentHtml ?? `<p>${safeExcerpt}</p>`),
           status: autoEdit ? "PUBLISHED" : "PENDING_REVIEW",
-          publishedAt: autoEdit ? now : null,
+          publishedAt: sourceDate,
           categoryId,
           sourceId: feed.sourceId,
           feedId: feed.id,
@@ -135,6 +136,8 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
         },
       });
       itemsCreated += 1;
+      await prisma.auditLog.create({ data: { userId: null, action: "ARTICLE_SOURCE_IMPORTED", entityType: "Article", entityId: article.id,
+        metadata: { sourcePublishedAt: sourceDate?.toISOString() ?? null, importedAt: new Date().toISOString(), dateNeedsReview: !sourceDate } } });
 
       if (autoEdit) {
         await prisma.auditLog.create({

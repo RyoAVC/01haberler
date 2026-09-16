@@ -13,3 +13,15 @@ export function selectHeadlines<T extends { id: string; slug: string }>(featured
     return true;
   }).slice(0, limit);
 }
+
+export function selectPinnedHeadlines<T extends { id: string; slug: string }>(slots: string[], pinned: T[], fallback: T[]): T[] {
+  const reserved = new Set(slots.filter(Boolean));
+  const used = new Set<string>();
+  const result: T[] = [];
+  for (let index = 0; index < 3; index++) {
+    const selected = pinned.find(a => a.id === slots[index] && isEditorialArticle(a) && !used.has(a.id));
+    const next = selected ?? fallback.find(a => !used.has(a.id) && !reserved.has(a.id) && isEditorialArticle(a));
+    if (next) { used.add(next.id); result.push(next); }
+  }
+  return result;
+}

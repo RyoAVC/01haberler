@@ -4,6 +4,20 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.4.0 — 2026-09-17
+
+- Ana sayfa için görselli manşet düzeni, kategori bölümleri ve yeni piyasa paneli.
+- Dolar/euro günlük referansları, ons altın ve hesaplanan gram altın; kaynak, tarih ve gecikme bilgisi.
+- Görünür sekmede dakika başı piyasa yenileme, zaman aşımı ve son veri alternatifi.
+- Avcı E-Ticaret / Adana360 özel sağ-sol bannerları; mobil yatay düzen.
+- Ana Sayfa Vitrini: üç manşet seçimi, otomatik tamamlama, banner aç/kapa ve denetim kaydı.
+- Operasyon Merkezi: kaynak sağlığı ve son haber alma işleri.
+- Cihazda Okuma Listem; haber kaydetme/kaldırma ve 100 kayıt sınırı.
+- Mobil yönetim menüsü daraltılabilir; bildirim daveti sayfa sonuna taşındı ve kapatma tercihi hatırlanıyor.
+- Yeni RSS alımlarında kaynak tarihi korunuyor; tarihi belirsiz/gelecekteki içerik otomatik yayımlanmıyor. Mevcut eski kayıtların tarihleri değiştirilmedi.
+- Cron kaynak aralıklarını gözetiyor; toplu onay mevcut yayın tarihini koruyor.
+- Sitemap'te noindex arama yerine Son Haberler yer alıyor.
+
 ## 1.3.0 — 2026-09-17
 
 - Haber düzenleyicide yazdıkça güncellenen yayın kalite kontrolü.

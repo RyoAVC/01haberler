@@ -10,6 +10,7 @@ import {
 import { formatDateTr } from "@/lib/utils/formatDate";
 import { newsArticleJsonLd, breadcrumbJsonLd } from "@/lib/seo/jsonld";
 import { ShareButtons } from "@/components/article/ShareButtons";
+import { SaveArticleButton } from "@/components/article/SaveArticleButton";
 import { ArticleViewTracker } from "@/components/article/ArticleViewTracker";
 import { ArticleCard } from "@/components/article/ArticleCard";
 import { CommentForm } from "@/components/article/CommentForm";
@@ -132,8 +133,9 @@ export default async function ArticleDetailPage({ params }: Props) {
             </div>
           )}
 
-          <div className="mt-6 rule-top rule-bottom py-3">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rule-top rule-bottom py-3">
             <ShareButtons url={canonicalUrl} title={article.title} />
+            <SaveArticleButton slug={article.slug} title={article.title} />
           </div>
 
           <AdSlot placement="ARTICLE_AFTER_LEAD" categorySlug={article.category.slug} eager />

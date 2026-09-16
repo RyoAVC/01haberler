@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { env } from "@/lib/env";
 import { runIngestionJob } from "@/server/ingestion/runIngestionJob";
+import { isFeedDue } from "@/lib/utils/sourceDate";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -27,6 +28,7 @@ export async function GET(request: Request) {
 
   const results = [];
   for (const feed of activeFeeds) {
+    if (!isFeedDue(feed)) continue;
     try {
       const jobId = await runIngestionJob(feed.id, "SCHEDULE");
       results.push({ feedId: feed.id, url: feed.url, jobId, ok: true });

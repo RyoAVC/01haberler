@@ -40,6 +40,7 @@ export async function Footer() {
             Takip Edin
           </h3>
           <ul className="mt-3 space-y-2 text-headline-s font-normal text-ink-secondary dark:text-ink-dark-secondary">
+            <li><Link href="/okuma-listem" className="hover:text-brand-red">Okuma listem</Link></li>
             <li>
               RSS: <Link href="/rss.xml" className="hover:text-brand-red">/rss.xml</Link>
             </li>

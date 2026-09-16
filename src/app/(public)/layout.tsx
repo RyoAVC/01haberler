@@ -23,9 +23,9 @@ export default async function PublicLayout({ children }: { children: React.React
       </a>
       <Header />
       <main id="main-content">{children}</main>
+      {pushEnabled && <PushOptIn vapidPublicKey={env.VAPID_PUBLIC_KEY} />}
       <Footer />
       <ConsentBanner />
-      {pushEnabled && <PushOptIn vapidPublicKey={env.VAPID_PUBLIC_KEY} />}
     </>
   );
 }

@@ -66,11 +66,12 @@ export async function bulkApproveArticles(formData: FormData) {
   if (ids.length === 0) return;
 
   const now = new Date();
+  const existingArticles = await prisma.article.findMany({ where: { id: { in: ids } }, select: { id: true, publishedAt: true } });
   await prisma.$transaction(
     ids.map((id) =>
       prisma.article.update({
         where: { id },
-        data: { status: "PUBLISHED", publishedAt: now },
+        data: { status: "PUBLISHED", publishedAt: existingArticles.find(a => a.id === id)?.publishedAt ?? now },
       })
     )
   );

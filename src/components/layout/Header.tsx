@@ -26,7 +26,7 @@ export async function Header() {
   });
 
   return (
-    <header className="sticky top-0 z-30 bg-surface dark:bg-surface-dark">
+    <header className="relative z-30 bg-surface dark:bg-surface-dark">
       <div className="hidden rule-bottom bg-surface dark:bg-surface-dark sm:block">
         <div className="container-page flex h-8 items-center justify-between text-meta text-ink-secondary dark:text-ink-dark-secondary">
           <span className="flex items-center gap-4">
@@ -51,6 +51,7 @@ export async function Header() {
           </Link>
 
           <div className="flex items-center gap-1">
+            <Link href="/okuma-listem" className="mr-2 hidden rounded-full border border-line px-4 py-2 text-caption dark:border-line-dark sm:block">Okuma listem</Link>
             <Link
               href="/arama"
               aria-label="Haber ara"
