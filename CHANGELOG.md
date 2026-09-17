@@ -4,6 +4,12 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.15.0 — 2026-09-17
+
+- Kompakt piyasa kartları ve 60 saniyelik kontrol göstergesi; günlük referans ve hesaplanmış gösterge açıklamaları korundu.
+- Ana sayfa kategori bölümlerine kısayollar ve bölüm vurguları.
+- Geniş ekran kenarlarında kategori/son gelişmeler, çok okunanlar ve ihbar/takip bağlantıları; sponsor reklamları korundu.
+
 ## 1.14.0 — 2026-09-17
 
 - Ana sayfa manşetle başlar; piyasa radarı ve son haber şeridi altına taşındı.

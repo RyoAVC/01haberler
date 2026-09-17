@@ -38,6 +38,9 @@ describe("home page with partial editorial data", () => {
     expect(html).toContain("Şehrin gündeminde bugün");
     expect(html).not.toContain("placeholder-news.svg");
     expect(html).toContain("Haftalık Fikstür");
+    expect(html).toContain('href="#bolum-gundem"');
+    expect(html).toContain('id="bolum-gundem"');
+    expect(html).toContain("HABER ROTASI");
     if (process.env.PREVIEW_HTML) writeFileSync(process.env.PREVIEW_HTML, `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/preview.css"><title>Yerel tasarım kontrolü</title></head><body><header class="container-page border-b py-5 font-serif text-headline-l">01 Haberler <small class="font-sans text-meta">Yerel önizleme · örnek içerik</small></header>${html}</body></html>`);
   });
 });

@@ -1,11 +1,11 @@
 export const softwareRelease = {
-  version: "1.14.0",
-  title: "Manşet öncelikli ana sayfa ve yeni header",
+  version: "1.15.0",
+  title: "Kompakt piyasa ve kategori odaklı ana sayfa",
   date: "2026-09-17",
   items: [
-    "Ana sayfanın ilk içerik alanı manşetler oldu; piyasa radarı ve son haber şeridi manşet altına taşındı.",
-    "Yeni logo düzeni, belirgin son haber bağlantısı ve masaüstünde doğrudan arama alanı.",
-    "Mobilde kompakt header; mevcut menü, tema ve arama erişimi korundu.",
+    "Küçültülen piyasa radarı, güncelleme göstergesi ve korunan kaynak/zaman bilgisi.",
+    "Kategori bölümlerine kısayollar ve belirgin bölüm başlıkları.",
+    "Geniş ekranda sol tarafta kategoriler/son gelişmeler; sağ tarafta çok okunanlar ve okur katılımı. Sponsor bannerları korundu.",
   ],
 };
 export const newsroomModules = [

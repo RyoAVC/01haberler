@@ -210,3 +210,32 @@
 .dark .header-search { border-color:#443e3c; }
 .dark .latest-pill { color:#ff7b8f; background:#ff7b8f12; }
 @media(max-width:639px) { .masthead { min-height:76px; gap:8px; }.brand-monogram { width:42px; height:42px; font-size:22px; border-radius:11px 11px 11px 2px; }.brand-name { font-size:29px; }.brand-caption { font-size:7px; letter-spacing:1.3px; margin-top:5px; }.edition-label { display:none; } }
+
+.market-compact .market-board-title { padding:7px 12px; }
+.market-compact .market-quote { padding:9px 12px; }
+.market-compact .market-value { font-size:20px; }
+.market-compact .market-note { font-size:9px; margin-top:2px; }
+.market-compact .market-details { padding:5px 12px; font-size:10px; }
+.market-compact > p { padding:4px 12px 6px; }
+.market-compact .market-quote > div:nth-child(2) { margin-top:3px; }
+.market-update-indicator { display:flex; align-items:center; gap:6px; font-size:9px; color:#147d69; }
+.market-update-indicator i { width:6px; height:6px; border-radius:50%; background:currentColor; box-shadow:0 0 0 3px #147d6915; }
+.home-category-index { display:flex; flex-wrap:wrap; gap:8px; padding:22px 0 4px; }
+.home-category-index a { display:flex; gap:20px; align-items:center; padding:10px 16px; background:#bd18310a; border:1px solid #bd183123; border-radius:8px; font-size:13px; font-weight:600; }
+.home-category-index a:hover { color:#bd1831; border-color:#bd1831; }
+[id^="bolum-"] { scroll-margin-top:20px; border-top:3px solid #bd1831; padding-top:18px; }
+.rail-panel { border:1px solid #dedbd5; border-radius:12px; padding:14px; margin-bottom:14px; background:#fff; }
+.rail-panel h2 { font-size:10px; font-weight:800; letter-spacing:1px; margin-bottom:12px; color:#bd1831; }
+.rail-panel nav a { display:flex; justify-content:space-between; padding:9px 0; font-size:13px; border-bottom:1px solid #8882; }
+.rail-panel li { padding:10px 0; border-bottom:1px solid #8882; font-size:12px; line-height:1.5; }
+.rail-panel li:last-child { border:0; }
+.rail-panel a:hover { color:#bd1831; }
+.rail-number { display:block; font-size:21px; font-weight:700; color:#bd1831; margin-bottom:4px; }
+.rail-more,.rail-community a { display:block; font-size:11px; margin-top:12px; text-decoration:underline; }
+.rail-community p { font-size:13px; line-height:1.5; }
+.dark .rail-panel { background:#1c2024; border-color:#383d40; }
+.home-rail .brand-campaign { position:relative; top:auto; }
+.home-rail .campaign-compact .campaign-link { display:flex; min-height:220px; padding:18px 14px; }
+.home-rail .campaign-compact .campaign-title { font-size:21px; margin-top:20px; }
+.home-rail .campaign-compact .campaign-cta { font-size:10px; }
+@media(max-width:767px) { .market-compact .market-quote { padding:8px 10px; }.market-compact .market-value { font-size:18px; }.market-compact .market-quote h3 { font-size:12px; } }

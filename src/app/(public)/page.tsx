@@ -1,3 +1,4 @@
+import { NewsRail } from "@/components/home/NewsRail";
 import Link from "next/link";
 import { HomeDiscovery } from "@/components/newsroom/HomeDiscovery";
 import { mediaFocus } from "@/lib/utils/mediaFocus";
@@ -75,8 +76,8 @@ export default async function HomePage() {
 
   return (
     <div className="home-stage">
-    {homeSettings.campaignsEnabled && <><div className="home-rail home-rail-left"><BrandCampaign brand="avci" /></div>
-    <div className="home-rail home-rail-right"><BrandCampaign brand="adana" /></div></>}
+    <><aside className="home-rail home-rail-left" aria-label="Haber kısayolları"><NewsRail side="left" articles={latest.filter(isEditorialArticle)} />{homeSettings.campaignsEnabled && <BrandCampaign brand="avci" compact />}</aside>
+    <aside className="home-rail home-rail-right" aria-label="Okur gündemi"><NewsRail side="right" articles={mostRead.filter(isEditorialArticle)} />{homeSettings.campaignsEnabled && <BrandCampaign brand="adana" compact />}</aside></>
     <div className="container-page home-canvas py-6">
       <h1 className="sr-only">01 Haberler — Günün manşetleri</h1>
       {mainHero && (
@@ -96,11 +97,12 @@ export default async function HomePage() {
 
       <AdSlot placement="HOME_BELOW_HERO" eager />
       <HomeDiscovery />
+<nav className="home-category-index" aria-label="Ana sayfa kategori bölümleri">{([["gundem", "Gündem", gundem], ["dunya", "Dünya", dunya], ["ekonomi", "Ekonomi", ekonomi], ["teknoloji", "Teknoloji", teknoloji], ["spor", "Spor", spor]] as const).filter(([, , items]) => items.length > 0).map(([slug, label]) => <Link key={String(slug)} href={`#bolum-${slug}`}>{String(label)} <span aria-hidden="true">↓</span></Link>)}</nav>
 
       <div className="grid gap-10 py-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex flex-col gap-10">
           {gundem.length > 0 && (
-            <section aria-label="Gündem" className="editorial-section">
+            <section id="bolum-gundem" aria-label="Gündem" className="editorial-section">
               <SectionHeading title="Gündem" href="/kategori/gundem" />
               <ul>
                 {gundem.map((a) => (
@@ -111,7 +113,7 @@ export default async function HomePage() {
           )}
 
           {dunya.length > 0 && (
-            <section aria-label="Dünya" className="editorial-section">
+            <section id="bolum-dunya" aria-label="Dünya" className="editorial-section">
               <SectionHeading title="Dünya" href="/kategori/dunya" />
               <div>
                 {dunya.map((a) => (
@@ -124,7 +126,7 @@ export default async function HomePage() {
           <AdSlot placement="IN_FEED" />
 
           {ekonomi.length > 0 && (
-            <section aria-label="Ekonomi" className="editorial-section">
+            <section id="bolum-ekonomi" aria-label="Ekonomi" className="editorial-section">
               <SectionHeading title="Ekonomi" href="/kategori/ekonomi" />
               <ul>
                 {ekonomi.map((a) => (
@@ -135,7 +137,7 @@ export default async function HomePage() {
           )}
 
           {teknoloji.length > 0 && (
-            <section aria-label="Teknoloji">
+            <section id="bolum-teknoloji" aria-label="Teknoloji">
               <SectionHeading title="Teknoloji" href="/kategori/teknoloji" />
               <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
                 {teknoloji.map((a) => (
@@ -146,7 +148,7 @@ export default async function HomePage() {
           )}
 
           {spor.length > 0 && (
-            <section aria-label="Spor">
+            <section id="bolum-spor" aria-label="Spor">
               <SectionHeading title="Spor" href="/kategori/spor" />
               <div>
                 {spor.map((a) => (

@@ -31,12 +31,12 @@ export function MarketBoard({ initial }: { initial: MarketSnapshot }) {
     { label: "Gram altın", code: "24 AYAR · TL", value: gram, change: null, note: "Hesaplanan gösterge" },
     { label: "Ons altın", code: "XAU / USD", value: gold?.price, change: null, note: gold?.stale ? "Son alınan veri" : "Sağlayıcı fiyatı" },
   ];
-  return <section aria-label="Piyasa özeti" className="market-board">
-    <div className="market-board-title"><span className="eyebrow">PİYASA RADARI</span><span className="text-caption">Döviz & altın</span></div>
+  return <section aria-label="Piyasa özeti" className="market-board market-compact">
+    <div className="market-board-title"><span className="eyebrow">PİYASA RADARI</span><span className="market-update-indicator"><i aria-hidden="true" />60 sn kontrol</span></div>
     <div className="market-quotes">{quotes.map(q => <div key={q.label} className="market-quote">
       <div className="flex items-center justify-between gap-2"><h3>{q.label}</h3><span className="text-[10px] tracking-wide text-ink-secondary dark:text-ink-dark-secondary">{q.code}</span></div>
-      <div className="mt-2 flex flex-wrap items-baseline gap-2"><strong className="text-2xl font-semibold tabular-nums tracking-tight">{money(q.value)}</strong>{q.change != null && <span className={`text-xs tabular-nums ${q.change >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-brand-red"}`}>{q.change > 0 ? "+" : ""}{q.change.toFixed(2)}%</span>}</div>
-      <p className="mt-1 text-[11px] text-ink-secondary dark:text-ink-dark-secondary">{q.value === undefined ? "Veri alınamadı" : q.note}</p>
+      <div className="mt-2 flex flex-wrap items-baseline gap-2"><strong className="market-value font-semibold tabular-nums tracking-tight">{money(q.value)}</strong>{q.change != null && <span className={`text-xs tabular-nums ${q.change >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-brand-red"}`}>{q.change > 0 ? "+" : ""}{q.change.toFixed(2)}%</span>}</div>
+      <p className="market-note text-ink-secondary dark:text-ink-dark-secondary">{q.value === undefined ? "Veri alınamadı" : q.note}</p>
     </div>)}</div>
     <p className="px-4 pb-3 text-[10px] text-ink-secondary dark:text-ink-dark-secondary">Kur tarihi: {rates?.date ?? "veri yok"} · Altın: {gold ? new Intl.DateTimeFormat("tr-TR", { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Istanbul" }).format(new Date(gold.updatedAt)) : "veri yok"} (TSİ){failed || rates?.stale || gold?.stale ? " · Güncelleme gecikmiş olabilir" : ""}</p>
     <details className="market-details"><summary>Kaynaklar ve güncelleme bilgisi{failed || rates?.stale || gold?.stale ? " · Son alınan veriler gösteriliyor" : ""}</summary>
