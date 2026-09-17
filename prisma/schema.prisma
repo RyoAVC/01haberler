@@ -219,6 +219,7 @@ model Source {
   isTrustedForAutoPublish Boolean            @default(false)
   defaultCategoryId       String?
   defaultCategory         Category?          @relation(fields: [defaultCategoryId], references: [id])
+  defaultCity             String?
   onDeleteAction          SourceDeleteAction @default(KEEP_ARTICLES)
   isActive                Boolean            @default(true)
   createdAt               DateTime           @default(now())
@@ -347,6 +348,9 @@ model Article {
   metaDescription String?
   canonicalUrl    String?
 
+  city     String?
+  district String?
+
   readingTimeMinutes Int @default(1)
   viewCount          Int @default(0)
 
@@ -364,6 +368,7 @@ model Article {
   @@index([publishedAt])
   @@index([isBreaking])
   @@index([contentHash])
+  @@index([city])
 }
 
 model ArticleRevision {

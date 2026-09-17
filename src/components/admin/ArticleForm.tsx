@@ -30,6 +30,8 @@ interface ExistingArticle {
   metaTitle: string | null;
   metaDescription: string | null;
   canonicalUrl: string | null;
+  city?: string | null;
+  district?: string | null;
   status: string;
   scheduledAt?: string;
   sourceUrl?: string | null;
@@ -288,6 +290,14 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
         <label htmlFor="canonicalUrl" className="block text-headline-s">
           Canonical URL (opsiyonel)
           <input id="canonicalUrl" name="canonicalUrl" defaultValue={article?.canonicalUrl ?? ""} className="mt-1 w-full border border-line bg-transparent px-3 py-2 dark:border-line-dark" />
+        </label>
+        <label htmlFor="city" className="block text-headline-s">
+          Şehir (yerel haber, opsiyonel)
+          <input id="city" name="city" defaultValue={article?.city ?? ""} maxLength={80} className="mt-1 w-full border border-line bg-transparent px-3 py-2 dark:border-line-dark" />
+        </label>
+        <label htmlFor="district" className="block text-headline-s">
+          İlçe (opsiyonel)
+          <input id="district" name="district" defaultValue={article?.district ?? ""} maxLength={80} className="mt-1 w-full border border-line bg-transparent px-3 py-2 dark:border-line-dark" />
         </label>
       </div>
       <label htmlFor="metaDescription" className="block text-headline-s">

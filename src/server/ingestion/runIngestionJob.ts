@@ -11,6 +11,7 @@ import { autoEditForPublish } from "@/server/services/aiEditorService";
 import { findBannedWordMatches } from "@/server/services/bannedWordService";
 import type { JobTrigger } from "@prisma/client";
 import { validSourceDate } from "@/lib/utils/sourceDate";
+import { resolveIngestedArticleStatus } from "@/lib/utils/ingestPublish";
 
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 1000;
@@ -114,14 +115,23 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
 
       const slug = await generateUniqueSlug(autoEdit?.title ?? item.title);
 
+      // Guvenilir kaynak + gecerli tarih + basarili AI duzenlemesi saglandiginda
+      // haber dogrudan yayimlanir; aksi halde incelemede kalir.
+      const status = resolveIngestedArticleStatus({
+        autoPublishEligible,
+        hasValidSourceDate: Boolean(sourceDate),
+        aiEditSucceeded: Boolean(autoEdit),
+      });
+
       const article = await prisma.article.create({
         data: {
           title: (autoEdit?.title ?? item.title).slice(0, 200),
           slug,
           excerpt: (autoEdit?.excerpt ?? safeExcerpt).slice(0, 500),
           contentHtml: sanitizeArticleHtml(autoEdit?.contentHtml ?? `<p>${safeExcerpt}</p>`),
-          status: "PENDING_REVIEW",
+          status,
           publishedAt: sourceDate,
+          city: feed.source.defaultCity,
           categoryId,
           sourceId: feed.sourceId,
           feedId: feed.id,
@@ -141,6 +151,13 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
       if (autoEdit) {
         await prisma.auditLog.create({
             data: { userId: null, action: "ARTICLE_AI_DRAFT_PREPARED", entityType: "Article", entityId: article.id },
+        });
+      }
+
+      if (status === "PUBLISHED") {
+        await prisma.auditLog.create({
+            data: { userId: null, action: "ARTICLE_AUTO_PUBLISH", entityType: "Article", entityId: article.id,
+              metadata: { sourceName: feed.source.name, publishedAt: sourceDate?.toISOString() ?? null } },
         });
       }
     }

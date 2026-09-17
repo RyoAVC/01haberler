@@ -28,6 +28,7 @@ export async function createSource(formData: FormData): Promise<void> {
     licenseNote: String(formData.get("licenseNote") ?? ""),
     isTrustedForAutoPublish: formData.get("isTrustedForAutoPublish") === "on",
     defaultCategoryId: (formData.get("defaultCategoryId") as string) || null,
+    defaultCity: (formData.get("defaultCity") as string) || null,
     onDeleteAction: String(formData.get("onDeleteAction") ?? "KEEP_ARTICLES"),
     isActive: true,
   };

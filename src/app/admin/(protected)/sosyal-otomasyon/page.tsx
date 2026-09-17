@@ -2,7 +2,8 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { hasPermission } from "@/lib/auth/rbac";
 import { formatDateTr } from "@/lib/utils/formatDate";
 import { prisma } from "@/lib/db";
-import { saveSocialAutoPostConfig } from "@/server/actions/socialConfigActions";
+import { saveSocialAutoPostConfig, saveSocialRules } from "@/server/actions/socialConfigActions";
+import { getSocialRules } from "@/server/services/socialRulesService";
 import type { SocialPlatform } from "@prisma/client";
 
 const PLATFORMS: SocialPlatform[] = ["TELEGRAM", "X", "FACEBOOK"];
@@ -14,9 +15,11 @@ export default async function AdminSocialAutomationPage() {
     return <p className="text-headline-s text-brand-red">Bu sayfayı görüntüleme yetkiniz yok.</p>;
   }
 
-  const [configs, logs] = await Promise.all([
+  const [configs, logs, categories, rules] = await Promise.all([
     prisma.socialAutoPostConfig.findMany(),
     prisma.socialPostLog.findMany({ orderBy: { createdAt: "desc" }, take: 20, include: { article: { select: { title: true } } } }),
+    prisma.category.findMany({ where: { isActive: true }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    getSocialRules(),
   ]);
   const configByPlatform = new Map(configs.map((c) => [c.platform, c]));
 
@@ -24,8 +27,32 @@ export default async function AdminSocialAutomationPage() {
     <div>
       <h1 className="font-serif text-headline-l">Sosyal Medya Otomasyonu</h1>
       <p className="mt-1 max-w-measure text-caption text-ink-secondary dark:text-ink-dark-secondary">
-        Bir haber yayınlandığında seçili platformlara otomatik paylaşım yapılır. Şu an yalnızca Telegram (bot token ile) tam entegre; X ve Facebook için API bağlantısı ayrıca kurulmalıdır.
+        Bir haber yayınlandığında seçili platformlara otomatik paylaşım yapılır. Telegram (bot token), X (OAuth2 kullanıcı jetonu) ve Facebook (Sayfa erişim jetonu + Sayfa ID) desteklenir. Aynı haber bir platforma yalnızca bir kez gönderilir.
       </p>
+
+      <section className="mt-6 border border-line p-4 dark:border-line-dark">
+        <h2 className="font-serif text-headline-m">Paylaşım Kuralları</h2>
+        <p className="mt-1 text-caption text-ink-secondary dark:text-ink-dark-secondary">
+          Sessiz saat aralığında paylaşım yapılmaz. Kategori seçilirse yalnızca o kategorilerdeki haberler paylaşılır (boş bırakılırsa tümü).
+        </p>
+        <form action={saveSocialRules} className="mt-3 grid gap-3 sm:grid-cols-2">
+          <label className="text-headline-s">
+            Sessiz saat başlangıcı (0-23)
+            <input type="number" name="quietStartHour" min={0} max={23} defaultValue={rules.quietStartHour ?? ""} className="mt-1 w-full border border-line bg-transparent px-3 py-2 dark:border-line-dark" />
+          </label>
+          <label className="text-headline-s">
+            Sessiz saat bitişi (0-23)
+            <input type="number" name="quietEndHour" min={0} max={23} defaultValue={rules.quietEndHour ?? ""} className="mt-1 w-full border border-line bg-transparent px-3 py-2 dark:border-line-dark" />
+          </label>
+          <label className="text-headline-s sm:col-span-2">
+            İzin verilen kategoriler (boş = tümü)
+            <select name="allowedCategoryIds" multiple defaultValue={rules.allowedCategoryIds} className="mt-1 h-32 w-full border border-line bg-transparent px-3 py-2 dark:border-line-dark">
+              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </label>
+          <button type="submit" className="bg-brand-red px-4 py-2 text-white hover:bg-brand-red-dark sm:col-span-2 sm:w-fit">Kuralları Kaydet</button>
+        </form>
+      </section>
 
       <div className="mt-6 space-y-6">
         {PLATFORMS.map((platform) => {
