@@ -3,7 +3,7 @@ test("homepage leads with headlines and masthead stays usable at all widths", as
   await page.goto("/");
   const hero = page.getByRole("region", { name: "Manşetler", exact: true });
   await expect(hero).toBeVisible();
-  const ticker = page.getByText("SON HABERLER", { exact: false }).first();
+  const ticker = page.locator(".home-canvas").getByText("Son Haberler", { exact: true });
   const heroBox = await hero.boundingBox();
   const tickerBox = await ticker.boundingBox();
   if (tickerBox) expect(heroBox!.y).toBeLessThan(tickerBox.y);
