@@ -26,3 +26,22 @@ it("reserves second headline while automatically filling the first", () => {
   expect(selectPinnedHeadlines(["", "a", ""], [a], [a, b, c])).toEqual([b, a, c]);
   expect(selectPinnedHeadlines(["a", "a", ""], [a], [a, b, c])).toEqual([a, b, c]);
 });
+
+it("rejects duplicate articles before writing settings or audit", async () => {
+  const form = new FormData(); form.set("primary", "news"); form.set("secondary1", "news");
+  await expect(saveHomeSettings(form)).rejects.toThrow("Aynı haber");
+  expect(mocks.count).not.toHaveBeenCalled(); expect(mocks.transaction).not.toHaveBeenCalled();
+});
+it("rejects reversed windows and records schedule details on successful saves", async () => {
+  const form = new FormData(); form.set("primary", "news"); form.set("start0", "2026-09-17T15:00"); form.set("end0", "2026-09-17T14:00");
+  await expect(saveHomeSettings(form)).rejects.toThrow("Bitiş zamanı");
+  expect(mocks.transaction).not.toHaveBeenCalled();
+  form.set("end0", "2026-09-17T16:00"); await saveHomeSettings(form);
+  expect(mocks.audit).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ userId: "admin", metadata: expect.objectContaining({ timezone: "Europe/Istanbul", settings: expect.objectContaining({ windows: expect.arrayContaining([{ startAt: "2026-09-17T12:00:00.000Z", endAt: "2026-09-17T13:00:00.000Z" }]) }) }) }) }));
+});
+it("replaces expired primary with newest unreserved article without repeating secondary", async () => {
+  const { activeHeadlineIds } = await import("@/lib/utils/headlineSchedule");
+  const old = { id: "old", slug: "old" }, newest = { id: "new", slug: "new" }, secondary = { id: "second", slug: "second" }, other = { id: "other", slug: "other" };
+  const ids = activeHeadlineIds(["old", "second", ""], [{ startAt: null, endAt: "2026-09-17T12:00:00Z" }], Date.parse("2026-09-17T12:00:00Z"));
+  expect(selectPinnedHeadlines(ids, [old, secondary], [newest, secondary, other, old])).toEqual([newest, secondary, other]);
+});

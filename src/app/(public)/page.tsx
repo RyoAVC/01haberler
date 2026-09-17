@@ -65,7 +65,7 @@ export default async function HomePage() {
   homeSettings.headlineIds = activeHeadlineIds(homeSettings.headlineIds, homeSettings.windows);
   const pinned = homeSettings.headlineIds.length ? await prisma.article.findMany({ where: { id: { in: homeSettings.headlineIds }, status: "PUBLISHED", publishedAt: { lte: new Date() } }, select: PUBLIC_ARTICLE_CARD_SELECT }) : [];
   pinned.sort((a, b) => homeSettings.headlineIds.indexOf(a.id) - homeSettings.headlineIds.indexOf(b.id));
-  const heroArticles = selectPinnedHeadlines(homeSettings.headlineIds, pinned, selectHeadlines(featured, latest, 10));
+  const heroArticles = selectPinnedHeadlines(homeSettings.headlineIds, pinned, selectHeadlines(latest, featured, 10));
   const mainHero = heroArticles[0];
   const heroMedia = await prisma.media.findMany({ where: { url: { in: heroArticles.flatMap(a => a.coverMedia ? [a.coverMedia.url] : []) } }, select: { id: true, url: true }, take: 10 });
   const heroFocus = await prisma.siteSetting.findMany({ where: { key: { in: heroMedia.map(m => `media_metadata_${m.id}`) } }, select: { key: true, value: true } });

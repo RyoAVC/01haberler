@@ -1,18 +1,14 @@
 export const softwareRelease = {
-  version: "1.9.0",
-  title: "Haber merkezi ve okur modülleri",
+  version: "1.10.0",
+  title: "Gelişmiş manşet planlayıcı",
   date: "2026-09-17",
   items: [
-    "Manşetlerde Türkiye saatine göre yayın aralığı, sürükle-bırak/klavye sıralaması ve mobil önizleme.",
-    "Konu dosyaları: özet, kişi/kurumlar, ilişkili haberler ve taslak/yayın akışı.",
-    "Yerel merkez: şehir/ilçe dosyaları ve konum izni istemeyen şehir araması.",
-    "Canlı anlatım: saatli gelişmeler, sabitleme, düzeltme notları ve paylaşım bağlantıları.",
-    "Yazar biyografisi, uzmanlık yönetimi ve cihazda yazar/konu takibi.",
-    "İhbar ve düzeltme formu, başvuru numarası, moderasyon kuyruğu ve hız sınırı.",
-    "E-posta bülteni: çift aşamalı onay, çıkış, günlük özet hazırlama ve editör onaylı küçük gönderim grupları. Sağlayıcı ayarı gerekir.",
-    "Medya odak noktası, kaynak/tarih kalite uyarıları ve cron sağlık kaydı.",
-    "AI çıktıları editör incelemesine alınır; doğrudan otomatik yayın kaldırıldı, editör önerilerine kullanım sınırı eklendi.",
-    "Ana sayfa keşif alanı ve Avcı E-Ticaret için siyah/kırmızı, mobil uyumlu marka bannerları.",
+    "Haber havuzundan birincil ve iki ikincil manşet alanına sürükle-bırak; dokunmatik/klavye için yerleştirme düğmeleri.",
+    "Manşet kartlarını zamanlarıyla birlikte sıralama, Türkiye saatine göre başlangıç ve bitiş.",
+    "Mobil ve masaüstü yerleşim önizlemesi; seçilen zamandaki otomatik alternatifleri görme.",
+    "Süresi dolan veya henüz başlamayan seçim yerine en yeni yayındaki haber; manşet grubunda tekrar engeli.",
+    "Sunucuda yetki, yayın durumu, mükerrer seçim ve tarih doğrulaması; ayar ayrıntılarıyla atomik işlem günlüğü.",
+    "Kayıt sırasında çift gönderim engeli; hata halinde formu koruyan açıklama ve başarı bildirimi.",
   ],
 };
 export const newsroomModules = [
@@ -29,3 +25,4 @@ export const newsroomModules = [
   { title: "E-posta bülteni", href: "/admin/bulten", detail: "Sağlayıcı bağlantısından sonra doğrulanmış abonelik ve gönderim" },
   { title: "AI editör yardımcısı", href: "/admin/haberler", detail: "Yapılandırılmış sağlayıcıyla editör onaylı öneriler" },
 ];
+

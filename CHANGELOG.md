@@ -4,6 +4,15 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.10.0 — 2026-09-17
+
+- Haber havuzundan birincil/ikincil manşete sürükle-bırak ve erişilebilir yerleştirme düğmeleri.
+- Mobil/masaüstü önizleme ve Türkiye saatiyle önizleme anı seçimi.
+- Mükerrer haber seçimi arayüzde ve sunucuda engellenir. Otomatik alternatifler en yeni yayındaki haberden başlar.
+- Her başarılı kayıt, seçilen haberler/zamanlar/banner tercihi ve kullanıcı bilgisiyle aynı işlemde audit log oluşturur.
+- Yetki ve yayın/tarih kontrolleri korunur; başarısız kayıtta form korunur, çift gönderim engellenir.
+- Son 200 habere ek olarak mevcut eski seçimler havuza dahil edilir.
+- Zaman geçişi ana sayfanın sonraki isteğinde uygulanır; açık sekmeler kendiliğinden yenilenmez.
 ## 1.9.0 — 2026-09-17
 
 - Manşet yayın aralıkları, sürükle-bırak ve klavye sıralaması, mobil önizleme.
@@ -101,3 +110,4 @@ Kullanım, sınırlar ve geri dönüş: `docs/NEWSROOM-MODULES.md`.
 
 Önceki yayın: temel haber yönetimi, modüller, RSS, yorum, anket, bildirim,
 sosyal otomasyon, yönlendirmeler, sürümler ve marka altyapısı. Ayrıntıları yönetim panelindedir.
+
