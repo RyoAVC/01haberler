@@ -136,6 +136,7 @@ export default async function AdminSourcesPage() {
             <option value="">Varsayılan kategori</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
+          <input name="defaultCity" placeholder="Yerel şehir (opsiyonel) — çekilen haberler bu şehre etiketlenir" maxLength={80} className="border border-line bg-transparent px-3 py-2 sm:col-span-2 dark:border-line-dark" />
           <select name="onDeleteAction" className="border border-line bg-transparent px-3 py-2 dark:border-line-dark">
             <option value="KEEP_ARTICLES">Silinirse: haberleri koru</option>
             <option value="ARCHIVE_ARTICLES">Silinirse: haberleri arşivle</option>

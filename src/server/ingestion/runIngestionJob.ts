@@ -131,6 +131,7 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
           contentHtml: sanitizeArticleHtml(autoEdit?.contentHtml ?? `<p>${safeExcerpt}</p>`),
           status,
           publishedAt: sourceDate,
+          city: feed.source.defaultCity,
           categoryId,
           sourceId: feed.sourceId,
           feedId: feed.id,
