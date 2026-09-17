@@ -25,6 +25,6 @@ test.describe("Haber olusturma ve yayinlama", () => {
     await expect(page.getByText("Kaydedildi.")).toBeVisible();
 
     await page.goto(`/arama?q=${encodeURIComponent(uniqueTitle)}`);
-    await expect(page.getByText(uniqueTitle)).toBeVisible();
+    await expect(page.getByRole("heading", { name: uniqueTitle, exact: true })).toBeVisible();
   });
 });
