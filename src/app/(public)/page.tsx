@@ -93,6 +93,10 @@ export default async function HomePage() {
 
       <div className="my-5"><LatestNewsTicker /></div>
       {market && <MarketBoard initial={market} />}
+      {latest.some((article) => Boolean(article.coverMedia)) && <section className="home-live-feed" aria-label="Günün haber akışı">
+        <div className="home-live-feed-heading"><div><span className="eyebrow">GÜNÜN AKIŞI</span><h2>Şimdi gündemde</h2></div><Link href="/son-haberler">Tüm son haberler →</Link></div>
+        <div className="home-live-feed-grid">{latest.filter((article) => Boolean(article.coverMedia)).slice(0, 6).map((article) => <SideImageItem key={article.id} article={article} />)}</div>
+      </section>}
       {homeSettings.campaignsEnabled && <div className="home-campaign-strip"><BrandCampaign brand="avci" compact /><BrandCampaign brand="adana" compact /></div>}
 
       <AdSlot placement="HOME_BELOW_HERO" eager />
