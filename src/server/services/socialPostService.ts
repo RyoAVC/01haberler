@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { isModuleEnabled } from "@/server/services/moduleFlagsService";
+import { currentIstanbulHour, getSocialRules, isSocialPostingAllowed } from "@/server/services/socialRulesService";
 import type { Article } from "@prisma/client";
 
 const REQUEST_TIMEOUT_MS = 8000;
@@ -85,6 +86,10 @@ export async function postToPlatform(
 
 export async function postArticleToSocialPlatforms(article: Article): Promise<void> {
   if (!(await isModuleEnabled("socialAutoPost"))) return;
+
+  // Sessiz saat ve kategori kurallari: uygun degilse hic paylasma.
+  const rules = await getSocialRules();
+  if (!isSocialPostingAllowed({ hour: currentIstanbulHour(), categoryId: article.categoryId, rules })) return;
 
   const configs = await prisma.socialAutoPostConfig.findMany({ where: { isActive: true } });
   if (configs.length === 0) return;
