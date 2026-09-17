@@ -61,6 +61,11 @@ jobs:
       - name: Create isolated CI database schema
         run: npx prisma db push --skip-generate
 
+      - name: Verify additive compatibility step is repeatable
+        run: |
+          node scripts/ensure-local-news-columns.cjs
+          node scripts/ensure-local-news-columns.cjs
+
       - name: Build
         run: npm run build
 
