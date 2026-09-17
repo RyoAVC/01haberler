@@ -4,6 +4,12 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.13.0 — 2026-09-17
+
+- Dosyalarda elle haber kimliği girmek yerine başlık araması ve tek tıklamayla seçim.
+- Seçim sıralama, kaldırma, tekrar engeli ve 100 haber sınırı.
+- Mevcut eski seçimler korunur; yayından kaldırılan haberler işaretlenir.
+
 ## 1.12.0 — 2026-09-17
 
 - Aktif canlı anlatımda 30 saniyelik otomatik yenileme; duraklat/sürdür ve elle yenileme.

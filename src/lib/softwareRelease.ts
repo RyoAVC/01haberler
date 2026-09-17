@@ -1,11 +1,11 @@
 export const softwareRelease = {
-  version: "1.12.0",
-  title: "Canlı anlatım otomatik yenileme",
+  version: "1.13.0",
+  title: "Dosyalarda başlıkla haber seçimi",
   date: "2026-09-17",
   items: [
-    "Aktif canlı anlatımın ilk sayfasında 30 saniyede bir otomatik yenileme.",
-    "Okur için duraklat/sürdür ve şimdi yenile kontrolleri; son içerik güncellemesi Türkiye saatiyle gösterilir.",
-    "Gizli sekmelerde ve çevrimdışıyken otomatik istek yapılmaz; arşivlerde ve kalıcı gelişme bağlantılarında otomatik yenileme kapalıdır.",
+    "Konu, yerel ve canlı dosyalarda başlıkla arama ve tek tıklamayla haber ekleme.",
+    "Seçilen haberleri sıralama, kaldırma ve yinelenen seçim engeli.",
+    "Son 150 haber ve mevcut eski seçimler; en fazla 100 haber. Yayından kaldırılmış seçimler için açıklayıcı uyarı.",
   ],
 };
 export const newsroomModules = [

@@ -1,3 +1,4 @@
+import { RelatedArticlePicker } from "@/components/admin/RelatedArticlePicker";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/session";
 import { hasPermission } from "@/lib/auth/rbac";
@@ -15,6 +16,8 @@ export default async function DossiersAdmin({ searchParams }: { searchParams: Pr
     listCollections(undefined, false, page), q.edit ? getCollection(q.edit, false) : null,
     prisma.article.findMany({ where: { status: "PUBLISHED", publishedAt: { lte: new Date() } }, orderBy: { publishedAt: "desc" }, take: 150, select: { id: true, title: true } }),
   ]);
+  const selectedArticles = editing?.articleIds.length ? await prisma.article.findMany({ where: { id: { in: editing.articleIds }, status: "PUBLISHED", publishedAt: { lte: new Date() } }, select: { id: true, title: true } }) : [];
+  const availableArticles = [...new Map([...articles, ...selectedArticles].map(a => [a.id, a])).values()];
   const entryPage = Math.max(1, Number(q.entries) || 1);
   const entries = editing?.kind === "canli" ? await getLiveEntries(editing.slug, entryPage) : [];
   return <div className="space-y-8"><header><p className="eyebrow">YAYIN MERKEZİ</p><h1 className="font-serif text-headline-l">Konu, yerel ve canlı dosyaları</h1><p className="mt-2">Haberleri bağlamıyla bir araya getirin. Taslaklar yalnızca yönetimde görünür.</p></header>
@@ -26,8 +29,7 @@ export default async function DossiersAdmin({ searchParams }: { searchParams: Pr
       <label>Dosya özeti<textarea name="summary" required minLength={10} maxLength={4000} rows={4} defaultValue={editing?.summary} /></label>
       <div className="grid gap-4 sm:grid-cols-2"><label>Şehir<input name="city" maxLength={80} defaultValue={editing?.city} /></label><label>İlçe<input name="district" maxLength={80} defaultValue={editing?.district} /></label></div>
       <label>İlgili kişi ve kurumlar<textarea name="people" rows={2} maxLength={1000} defaultValue={editing?.people} placeholder="Her satıra bir kişi veya kurum" /></label>
-      <label>İlgili haber kimlikleri<textarea name="articleIds" rows={3} defaultValue={editing?.articleIds.join("\n")} placeholder="Her satıra bir haber kimliği; en fazla 100 haber" /></label>
-      <details><summary>Haber kimliklerini bul</summary><ul className="max-h-64 overflow-auto text-caption">{articles.map(a => <li key={a.id} className="border-b border-line-dark py-2">{a.title}<br /><code className="select-all">{a.id}</code></li>)}</ul></details>
+      <RelatedArticlePicker articles={availableArticles} initialIds={editing?.articleIds ?? []} />
       <label>Yayın durumu<select name="status" defaultValue={editing?.status ?? "DRAFT"}><option value="DRAFT">Taslak</option><option value="PUBLISHED">Yayında</option><option value="CLOSED">Tamamlandı (arşiv olarak görünür)</option></select></label>
       <button className="module-button">Dosyayı kaydet</button> {editing && <Link href="/admin/dosyalar" className="ml-3 underline">Yeni dosya aç</Link>}
     </ActionForm>
