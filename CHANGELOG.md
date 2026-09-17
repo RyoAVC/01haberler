@@ -4,6 +4,12 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.12.0 — 2026-09-17
+
+- Aktif canlı anlatımda 30 saniyelik otomatik yenileme; duraklat/sürdür ve elle yenileme.
+- Son içerik güncellemesi TSİ ile gösterilir. Gizli sekmelerde ve çevrimdışıyken otomatik istek yapılmaz.
+- Tamamlanmış dosyalar, eski sayfalar ve kalıcı gelişme bağlantıları otomatik yenilenmez.
+
 ## 1.11.0 — 2026-09-17
 
 - Medya üzerinde tıklayarak odak seçimi, klavye ile yüzde ayarı ve merkeze alma.

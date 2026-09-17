@@ -1,12 +1,11 @@
 export const softwareRelease = {
-  version: "1.11.0",
-  title: "Görsel odak seçimi ve kırpma önizlemesi",
+  version: "1.12.0",
+  title: "Canlı anlatım otomatik yenileme",
   date: "2026-09-17",
   items: [
-    "Medya merkezinde görsele tıklayarak odak noktası seçme.",
-    "Klavyeyle odak yüzdelerini değiştirme ve tek düğmeyle merkeze alma.",
-    "Geniş ekran ve mobil için farklı oranlarda canlı kırpma önizlemesi.",
-    "Özgün dosyayı değiştirmeyen odak ayarı; mevcut sahiplik, yetki ve audit kontrolleri korunur.",
+    "Aktif canlı anlatımın ilk sayfasında 30 saniyede bir otomatik yenileme.",
+    "Okur için duraklat/sürdür ve şimdi yenile kontrolleri; son içerik güncellemesi Türkiye saatiyle gösterilir.",
+    "Gizli sekmelerde ve çevrimdışıyken otomatik istek yapılmaz; arşivlerde ve kalıcı gelişme bağlantılarında otomatik yenileme kapalıdır.",
   ],
 };
 export const newsroomModules = [
