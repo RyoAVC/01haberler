@@ -8,6 +8,7 @@ export const sourceInputSchema = z.object({
   licenseNote: z.string().min(5, "Lisans/kullanim kosulu notu zorunludur").max(1000),
   isTrustedForAutoPublish: z.boolean().default(false),
   defaultCategoryId: z.string().optional().nullable(),
+  defaultCity: z.string().max(80).optional().nullable(),
   onDeleteAction: z.enum(["KEEP_ARTICLES", "ARCHIVE_ARTICLES", "DELETE_ARTICLES"]).default("KEEP_ARTICLES"),
   isActive: z.boolean().default(true),
 });
