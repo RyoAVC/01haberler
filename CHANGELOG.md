@@ -110,4 +110,3 @@ Kullanım, sınırlar ve geri dönüş: `docs/NEWSROOM-MODULES.md`.
 
 Önceki yayın: temel haber yönetimi, modüller, RSS, yorum, anket, bildirim,
 sosyal otomasyon, yönlendirmeler, sürümler ve marka altyapısı. Ayrıntıları yönetim panelindedir.
-

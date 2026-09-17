@@ -24,4 +24,3 @@ export default async function VitrinePage({ searchParams }: { searchParams: Prom
       <button className="rounded-full bg-brand-red px-6 py-3 text-white">Vitrini kaydet</button><Link href="/" target="_blank" className="ml-4 text-caption underline">Ana sayfayı aç ↗</Link>
     </ActionForm></div>;
 }
-

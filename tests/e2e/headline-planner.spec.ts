@@ -20,7 +20,10 @@ test("headline planner supports pool drag, previews, scheduling, duplicate preve
     await page.getByRole("article", { name: `Sürükle: ${articles[2]!.title}`, exact: true }).dragTo(page.getByRole("region", { name: "Birincil manşet", exact: true }));
     await expect(page.locator('select[name="primary"]')).toHaveValue(articles[2]!.id);
     await page.locator('select[name="secondary1"]').selectOption(articles[1]!.id);
-    await expect(page.locator(`select[name="secondary2"] option[value="${articles[2]!.id}"]`)).toBeDisabled();
+    await expect(page.locator(`select[name="secondary2"] option[value="${articles[2]!.id}"]`)).toHaveAttribute("disabled", "");
+    await page.getByRole("button", { name: `${articles[2]!.title} haberini İkincil manşet 2 alanına yerleştir`, exact: true }).click();
+    await expect(page.locator('select[name="secondary2"]')).toHaveValue("");
+    await expect(page.getByText("Bu haber başka bir manşette seçili.", { exact: false })).toBeVisible();
     await page.locator('input[name="start0"]').fill("2020-01-01T00:00");
     await page.locator('input[name="end0"]').fill("2020-01-02T00:00");
     const preview = page.getByTestId("headline-preview");

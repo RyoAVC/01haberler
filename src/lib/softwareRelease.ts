@@ -25,4 +25,3 @@ export const newsroomModules = [
   { title: "E-posta bülteni", href: "/admin/bulten", detail: "Sağlayıcı bağlantısından sonra doğrulanmış abonelik ve gönderim" },
   { title: "AI editör yardımcısı", href: "/admin/haberler", detail: "Yapılandırılmış sağlayıcıyla editör onaylı öneriler" },
 ];
-
