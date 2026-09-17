@@ -8,6 +8,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
+    "prebuild": "node scripts/ensure-local-news-columns.cjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",
