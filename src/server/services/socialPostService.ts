@@ -16,6 +16,16 @@ function fitForX(text: string): string {
   return text.slice(0, X_MAX_CHARS - 1).trimEnd() + "…";
 }
 
+// Bir habere daha once basariyla gonderilen platformlar atlanir; boylece haber
+// yeniden yayimlandiginda (arsiv -> tekrar yayin gibi) ayni platforma tekrar gonderilmez.
+export function pendingPlatforms<T extends { platform: string }>(
+  configs: T[],
+  alreadyPosted: Iterable<string>
+): T[] {
+  const done = new Set(alreadyPosted);
+  return configs.filter((c) => !done.has(c.platform));
+}
+
 export async function postToPlatform(
   platform: "X" | "FACEBOOK" | "TELEGRAM",
   message: string,
@@ -79,10 +89,18 @@ export async function postArticleToSocialPlatforms(article: Article): Promise<vo
   const configs = await prisma.socialAutoPostConfig.findMany({ where: { isActive: true } });
   if (configs.length === 0) return;
 
+  // Daha once basariyla gonderilen platformlari atla (tekrar paylasimi onle).
+  const posted = await prisma.socialPostLog.findMany({
+    where: { articleId: article.id, status: "SUCCESS" },
+    select: { platform: true },
+  });
+  const targets = pendingPlatforms(configs, posted.map((p) => p.platform));
+  if (targets.length === 0) return;
+
   const appUrl = process.env.APP_URL ?? "http://localhost:3000";
   const url = `${appUrl}/haber/${article.slug}`;
 
-  for (const config of configs) {
+  for (const config of targets) {
     const message = renderTemplate(config.messageTemplate, article, url);
     try {
       const result = await postToPlatform(config.platform, message, config);

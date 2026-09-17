@@ -7,6 +7,14 @@ async function load() {
   return mod.postToPlatform;
 }
 
+it("pendingPlatforms skips platforms already posted successfully", async () => {
+  const { pendingPlatforms } = await import("@/server/services/socialPostService");
+  const configs = [{ platform: "X" }, { platform: "FACEBOOK" }, { platform: "TELEGRAM" }];
+  expect(pendingPlatforms(configs, ["X", "TELEGRAM"])).toEqual([{ platform: "FACEBOOK" }]);
+  expect(pendingPlatforms(configs, [])).toEqual(configs);
+  expect(pendingPlatforms(configs, ["X", "FACEBOOK", "TELEGRAM"])).toEqual([]);
+});
+
 it("X: posts a tweet and returns the tweet id", async () => {
   const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: { id: "999" } }) });
   vi.stubGlobal("fetch", fetcher);
