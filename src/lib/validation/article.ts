@@ -22,6 +22,8 @@ export const articleInputSchema = z.object({
   metaTitle: z.string().max(70).optional().nullable(),
   metaDescription: z.string().max(160).optional().nullable(),
   canonicalUrl: z.string().url().optional().nullable(),
+  city: z.string().max(80).optional().nullable(),
+  district: z.string().max(80).optional().nullable(),
   status: articleStatusEnum.default("DRAFT"),
   isBreaking: z.boolean().default(false),
   breakingStartAt: z.coerce.date().optional().nullable(),

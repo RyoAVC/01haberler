@@ -57,6 +57,8 @@ export default async function EditArticlePage({ params, searchParams }: Props) {
           metaTitle: article.metaTitle,
           metaDescription: article.metaDescription,
           canonicalUrl: article.canonicalUrl,
+          city: article.city,
+          district: article.district,
           status: article.status,
           scheduledAt: formatPublicationSchedule(article.scheduledAt),
           sourceUrl: article.sourceUrl,

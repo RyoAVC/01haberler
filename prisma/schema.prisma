@@ -347,6 +347,9 @@ model Article {
   metaDescription String?
   canonicalUrl    String?
 
+  city     String?
+  district String?
+
   readingTimeMinutes Int @default(1)
   viewCount          Int @default(0)
 
@@ -364,6 +367,7 @@ model Article {
   @@index([publishedAt])
   @@index([isBreaking])
   @@index([contentHash])
+  @@index([city])
 }
 
 model ArticleRevision {
