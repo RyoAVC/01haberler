@@ -1,11 +1,12 @@
 export const softwareRelease = {
-  version: "1.15.0",
-  title: "Kompakt piyasa ve kategori odaklı ana sayfa",
+  version: "1.16.0",
+  title: "Canlı haber akışlı ana sayfa",
   date: "2026-09-17",
   items: [
     "Küçültülen piyasa radarı, güncelleme göstergesi ve korunan kaynak/zaman bilgisi.",
     "Kategori bölümlerine kısayollar ve belirgin bölüm başlıkları.",
     "Geniş ekranda sol tarafta kategoriler/son gelişmeler; sağ tarafta çok okunanlar ve okur katılımı. Sponsor bannerları korundu.",
+    "Kapak görseli bulunan son haberlerden oluşan Günün Akışı kartları ana sayfaya eklendi.",
   ],
 };
 export const newsroomModules = [
