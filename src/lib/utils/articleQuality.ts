@@ -7,6 +7,9 @@ export interface ArticleQualityInput {
   coverImageAlt: string;
   metaTitle: string;
   metaDescription: string;
+  sourceUrl?: string | null;
+  sourceRequired?: boolean;
+  sourcePublishedAt?: string | null;
 }
 
 export interface QualityIssue { field: string; message: string }
@@ -34,6 +37,10 @@ export function inspectArticle(input: ArticleQualityInput) {
   if (!body) add("contentHtml-editor", "Haber gövdesi boş; içeriği kontrol edin.");
   else if (body === qualityText(excerpt)) add("contentHtml-editor", "Haber gövdesi spotla aynı. Kısa haber mi, eksik içerik mi olduğunu kontrol edin.");
   if (!input.categoryId) add("categoryId", "Bir haber kategorisi seçin.");
+  if (input.sourceRequired && !input.sourceUrl) add("sourceInfo", "İçe aktarılan haberin kaynak bağlantısı eksik.");
+  if (input.sourceUrl && (!URL.canParse(input.sourceUrl) || !/^https?:\/\//i.test(input.sourceUrl))) add("sourceInfo", "Kaynak bağlantısı geçerli bir http/https adresi olmalı.");
+  if (input.sourceRequired && (!input.sourcePublishedAt || !Number.isFinite(Date.parse(input.sourcePublishedAt)))) add("sourceInfo", "Kaynak yayın tarihi doğrulanamadı; tarihi editör kontrol etmeli.");
+  if (input.sourcePublishedAt && Date.parse(input.sourcePublishedAt) > Date.now() + 60000) add("sourceInfo", "Kaynak yayın tarihi gelecekte görünüyor.");
   if (!input.coverMediaId) add("coverFile", "Kapak görseli yok. Görselsiz yayın tercihini kontrol edin.");
   else if (!input.coverImageAlt.trim()) add("coverImageAlt", "Kapak görselini açıklayan bir alt metin ekleyin.");
   if (input.coverImageAlt.length > 200) add("coverImageAlt", "Görsel alt metni en fazla 200 karakter olmalı.");

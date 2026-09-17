@@ -1,0 +1,8 @@
+"use client";
+import { useState } from "react";
+import { suggestHeadlineTagsAction } from "@/server/actions/aiEditorActions";
+import { qualityText } from "@/lib/utils/articleQuality";
+export function AiHeadlineSuggestions({ title, content, onApply }: { title: string; content: string; onApply: (title: string) => void }) {
+  const [busy, setBusy] = useState(false), [result, setResult] = useState<{ title?: string; tags?: string[]; error?: string }>({});
+  return <section className="rounded-xl border border-line-dark p-4"><h2 className="font-serif text-headline-m">Editör yardımcısı</h2><p className="my-2 text-caption">Kaynağa bağlı başlık ve etiket önerisi. Doğruluğunu kontrol ederek uygulayın; öneri haber yayımlamaz.</p><button type="button" className="rounded border border-line-dark px-4 py-2 text-caption" disabled={busy || !title || !qualityText(content)} onClick={async () => { setBusy(true); try { setResult(await suggestHeadlineTagsAction(title, qualityText(content))); } catch { setResult({ error: "Öneri alınamadı. Kullanım sınırını ve sağlayıcı bağlantısını kontrol edin." }); } finally { setBusy(false); } }}>{busy ? "Öneri hazırlanıyor…" : "Başlık ve etiket öner"}</button>{result.error && <p role="alert" className="mt-3 text-caption text-brand-red">{result.error}</p>}{result.title && <div className="mt-4"><p className="font-serif text-headline-m">{result.title}</p><button type="button" onClick={() => onApply(result.title!)} className="my-3 text-caption underline">Bu başlığı kullan</button><p className="text-caption">Etiket önerileri: {result.tags?.join(", ")}</p><p className="mt-1 text-caption">Uygun etiketleri aşağıdaki mevcut etiket listesinden seçin.</p></div>}</section>;
+}

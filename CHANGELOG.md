@@ -4,13 +4,29 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
-## 1.7.0 — 2026-09-17
+## 1.9.0 — 2026-09-17
+
+- Manşet yayın aralıkları, sürükle-bırak ve klavye sıralaması, mobil önizleme.
+- Konu dosyaları, şehir/ilçe merkezleri ve canlı anlatım için ortak editör yönetimi; taslak gizliliği, ilişkili haberler, kişi/kurum araması, düzeltme ve kalıcı gelişme bağlantıları.
+- Yazar biyografisi ve uzmanlık yönetimi; cihazda konu, şehir dosyası, canlı anlatım ve yazar takibi.
+- İhbar/düzeltme başvuruları: açık onay, hız sınırı, referans numarası, özel moderasyon kuyruğu ve denetim kaydı.
+- Bülten: Resend bağlantısı, çift aşamalı abonelik onayı, POST ile abonelikten çıkış, günlük özet hazırlama, editör onaylı beş kişilik gönderim grupları ve yinelenen gönderim koruması. Sağlayıcı yapılandırılmadığında abonelik kapalıdır.
+- Medya merkezinde odak noktası; ana sayfa manşetinde odaklı kırpma. Kaynak bağlantısı ve tarih için kalite uyarıları. Cron son çalışma ve gecikme görünürlüğü.
+- AI başlık/etiket önerileri, saatlik editör kotası, kaynak metne bağlı talimatlar ve süre sınırı. Kaynaklardan AI ile hazırlanan içerikler otomatik yayımlanmaz; editör incelemesine gider.
+- Yeni ana sayfa keşif alanı; Avcı E-Ticaret bannerlarında siyah/kırmızı tasarım ve okunaklı mobil yerleşim.
+- Sürümler ekranına yazılımla gelen kayıt; Modüller ekranında 12 modülün bağlantısı ve kapsamı.
+- CI, gerçek varsayılan dal olan master için de çalışır; izole PostgreSQL/Redis ve tarayıcı senaryoları eklenmiştir.
+- Kurulum/yönetim sayfaları istek sırasında oluşturulur; Redis bağlantısı ilk kullanıma ertelenir.
+
+Kullanım, sınırlar ve geri dönüş: `docs/NEWSROOM-MODULES.md`.
 
 ## 1.8.0 — 2026-09-17
 
 - Avcı E-Ticaret bannerları gerçek marka logo ve banner varlıklarıyla yenilendi.
 - Kompakt ana sayfa reklamında verilen animasyonlu GIF kullanılıyor; masaüstü railinde logo korunuyor.
 - Avcı CTA hedefi `https://avcieticaret.com` olarak korunuyor; reklam etiketi ve sponsor bağlantı niteliği sürüyor.
+
+## 1.7.0 — 2026-09-17
 
 - Sekmeye ve kullanıcıya özel geçici metin kurtarma: başlık, spot, gövde ve SEO metinleri; elle geri alma, 24 saatlik geçerlilik ve başarılı kayıtta temizleme.
 - Editörde metin önizlemesi; beklenmedik kayıt hatasında metni koruyan açıklayıcı hata.

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getArticlesByAuthorSlug } from "@/server/services/articleService";
 import { ArticleCard } from "@/components/article/ArticleCard";
 import { Pagination } from "@/components/ui/Pagination";
+import { FollowButton } from "@/components/newsroom/FollowButton";
 
 const PAGE_SIZE = 12;
 
@@ -26,6 +27,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
   const { sayfa } = await searchParams;
   const author = await prisma.author.findUnique({ where: { slug } });
   if (!author) notFound();
+  const expertise = await prisma.siteSetting.findUnique({ where: { key: `author_expertise_${author.id}` } });
 
   const page = Math.max(1, Number(sayfa) || 1);
   const { items, total } = await getArticlesByAuthorSlug(slug, page, PAGE_SIZE);
@@ -37,11 +39,13 @@ export default async function AuthorPage({ params, searchParams }: Props) {
       <div className="mb-6 rule-bottom pb-4">
         <h1 className="font-serif text-headline-l">{author.name}</h1>
         {author.bio && <p className="mt-2 max-w-measure text-body text-ink-secondary dark:text-ink-dark-secondary">{author.bio}</p>}
+        {typeof expertise?.value === "string" && expertise.value && <p className="my-3 text-caption">Uzmanlık: {expertise.value}</p>}
+        <div className="mt-4"><FollowButton item={{ title: author.name, href: `/yazar/${author.slug}` }} /></div>
       </div>
       {items.length === 0 ? (
         <p className="text-ink-secondary dark:text-ink-dark-secondary">Bu yazarın henüz haberi bulunmuyor.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3">
           {items.map((article) => (
             <ArticleCard key={article.id} article={article} />
           ))}

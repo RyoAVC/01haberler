@@ -14,9 +14,11 @@ export async function saveMediaMetadata(id: string, form: FormData) {
   const credit = String(form.get("credit") ?? "").trim().slice(0, 300);
   const rights = String(form.get("rights") ?? "").trim().slice(0, 1000);
   const key = `media_metadata_${id}`;
+  const focusX = Number(form.get("focusX") ?? 50), focusY = Number(form.get("focusY") ?? 50);
+  if (![focusX, focusY].every(n => Number.isFinite(n) && n >= 0 && n <= 100)) throw new Error("Odak noktası 0–100 aralığında olmalı.");
   await prisma.$transaction([
     prisma.media.update({ where: { id }, data: { altText: altText || null } }),
-    prisma.siteSetting.upsert({ where: { key }, create: { key, value: { credit, rights } }, update: { value: { credit, rights } } }),
+    prisma.siteSetting.upsert({ where: { key }, create: { key, value: { credit, rights, focusX, focusY }, updatedById: user.id }, update: { value: { credit, rights, focusX, focusY }, updatedById: user.id } }),
     prisma.auditLog.create({ data: { userId: user.id, action: "MEDIA_METADATA_UPDATE", entityType: "Media", entityId: id } }),
   ]);
   revalidatePath("/admin/medya"); revalidatePath("/", "layout");

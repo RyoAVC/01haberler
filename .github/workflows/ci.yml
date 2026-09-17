@@ -2,15 +2,16 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
 
 jobs:
   lint-typecheck-build:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: "postgresql://haberler:changeme@localhost:5432/haberler01?schema=public"
+      DIRECT_URL: "postgresql://haberler:changeme@localhost:5432/haberler01?schema=public"
       REDIS_URL: "redis://localhost:6379"
       SESSION_SECRET: "ci-test-secret-please-override-in-production-0000000000"
     services:
@@ -57,8 +58,8 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      - name: Run migrations
-        run: npx prisma migrate deploy
+      - name: Create isolated CI database schema
+        run: npx prisma db push --skip-generate
 
       - name: Build
         run: npm run build
@@ -77,3 +78,11 @@ jobs:
         env:
           E2E_ADMIN_EMAIL: "e2e@01haberler.com"
           E2E_ADMIN_PASSWORD: "CiTestParola123!"
+
+      - name: Upload browser test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-results
+          path: test-results/
+          retention-days: 7

@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { HomeDiscovery } from "@/components/newsroom/HomeDiscovery";
+import { mediaFocus } from "@/lib/utils/mediaFocus";
+import { activeHeadlineIds } from "@/lib/utils/headlineSchedule";
 import { HeroCard } from "@/components/article/HeroCard";
 import { LatestNewsTicker } from "@/components/layout/LatestNewsTicker";
 import { FixturesWidget } from "@/components/widgets/FixturesWidget";
@@ -59,10 +62,14 @@ export default async function HomePage() {
   const activePoll = pollsEnabled ? await getActivePoll() : null;
 
   const homeSettings = await getHomeSettings();
+  homeSettings.headlineIds = activeHeadlineIds(homeSettings.headlineIds, homeSettings.windows);
   const pinned = homeSettings.headlineIds.length ? await prisma.article.findMany({ where: { id: { in: homeSettings.headlineIds }, status: "PUBLISHED", publishedAt: { lte: new Date() } }, select: PUBLIC_ARTICLE_CARD_SELECT }) : [];
   pinned.sort((a, b) => homeSettings.headlineIds.indexOf(a.id) - homeSettings.headlineIds.indexOf(b.id));
   const heroArticles = selectPinnedHeadlines(homeSettings.headlineIds, pinned, selectHeadlines(featured, latest, 10));
   const mainHero = heroArticles[0];
+  const heroMedia = await prisma.media.findMany({ where: { url: { in: heroArticles.flatMap(a => a.coverMedia ? [a.coverMedia.url] : []) } }, select: { id: true, url: true }, take: 10 });
+  const heroFocus = await prisma.siteSetting.findMany({ where: { key: { in: heroMedia.map(m => `media_metadata_${m.id}`) } }, select: { key: true, value: true } });
+  const focusFor = (url?: string) => mediaFocus(heroFocus.find(s => s.key === `media_metadata_${heroMedia.find(m => m.url === url)?.id}`)?.value);
   const secondaryHero = heroArticles.slice(1, 3);
   const market = await isModuleEnabled("currency") ? await getMarketSnapshot() : null;
 
@@ -79,10 +86,10 @@ export default async function HomePage() {
 
       {mainHero && (
         <section aria-label="Manşetler" className={`home-headlines ${secondaryHero.length ? "has-secondary" : ""}`}>
-          <HomeHeadline article={mainHero} primary />
+          <HomeHeadline article={mainHero} primary focus={focusFor(mainHero.coverMedia?.url)} />
           {secondaryHero.length > 0 && <div className="secondary-headlines">
             {secondaryHero.map((a) => (
-              <HomeHeadline key={a.id} article={a} />
+              <HomeHeadline key={a.id} article={a} focus={focusFor(a.coverMedia?.url)} />
             ))}
           </div>}
         </section>
@@ -91,6 +98,7 @@ export default async function HomePage() {
       {homeSettings.campaignsEnabled && <div className="home-campaign-strip"><BrandCampaign brand="avci" compact /><BrandCampaign brand="adana" compact /></div>}
 
       <AdSlot placement="HOME_BELOW_HERO" eager />
+      <HomeDiscovery />
 
       <div className="grid gap-10 py-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex flex-col gap-10">

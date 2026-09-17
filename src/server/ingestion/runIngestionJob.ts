@@ -9,7 +9,6 @@ import { sanitizeArticleHtml } from "@/lib/utils/sanitize";
 import { isModuleEnabled } from "@/server/services/moduleFlagsService";
 import { autoEditForPublish } from "@/server/services/aiEditorService";
 import { findBannedWordMatches } from "@/server/services/bannedWordService";
-import { postArticleToSocialPlatforms, pingGoogleSitemap } from "@/server/services/socialPostService";
 import type { JobTrigger } from "@prisma/client";
 import { validSourceDate } from "@/lib/utils/sourceDate";
 
@@ -121,7 +120,7 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
           slug,
           excerpt: (autoEdit?.excerpt ?? safeExcerpt).slice(0, 500),
           contentHtml: sanitizeArticleHtml(autoEdit?.contentHtml ?? `<p>${safeExcerpt}</p>`),
-          status: autoEdit ? "PUBLISHED" : "PENDING_REVIEW",
+          status: "PENDING_REVIEW",
           publishedAt: sourceDate,
           categoryId,
           sourceId: feed.sourceId,
@@ -141,10 +140,8 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
 
       if (autoEdit) {
         await prisma.auditLog.create({
-          data: { userId: null, action: "ARTICLE_AUTO_PUBLISH", entityType: "Article", entityId: article.id },
+            data: { userId: null, action: "ARTICLE_AI_DRAFT_PREPARED", entityType: "Article", entityId: article.id },
         });
-        await postArticleToSocialPlatforms(article);
-        await pingGoogleSitemap();
       }
     }
 

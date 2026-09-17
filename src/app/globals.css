@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+.module-card { border: 1px solid #d7d9df; border-radius: 18px; padding: clamp(16px, 3vw, 28px); min-width: 0; overflow-wrap: anywhere; }
+.dark .module-card { border-color: #35373d; }
+.module-heading { margin-bottom: 32px; max-width: 850px; }
+.module-heading h1 { font-family: Georgia, serif; font-size: clamp(30px, 5vw, 52px); line-height: 1.12; letter-spacing: -.035em; margin: 12px 0 20px; }
+.module-heading > p:not(.eyebrow) { font-size: 17px; line-height: 1.7; opacity: .8; }
+.module-form { max-width: 850px; border: 1px solid #6b728044; border-radius: 18px; padding: clamp(16px, 3vw, 28px); }
+.module-form label { display: block; font-size: 14px; line-height: 1.5; }
+.module-form input:not([type=checkbox]):not([type=hidden]), .module-form select, .module-form textarea { display: block; width: 100%; min-width: 0; margin-top: 6px; border: 1px solid #8b8f9855; border-radius: 8px; padding: 10px 12px; background: transparent; color: inherit; }
+.module-form option { color: #111827; background: #fff; }
+.module-form input[type=checkbox] { width: 18px; height: 18px; margin-right: 8px; vertical-align: middle; }
+.module-form [aria-hidden] { display: none; }
+.module-form :focus-visible, .discovery-nav a:focus-visible { outline: 2px solid #c92431; outline-offset: 3px; }
+.module-form :disabled { opacity: .6; cursor: wait; }
+.module-button { background: #c51d2a; color: #fff; border-radius: 999px; padding: 12px 22px; font-size: 14px; font-weight: 600; }
+.module-form p[role] { margin-top: 14px; }
+.discovery-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border-block: 1px solid #8b8f9844; }
+.discovery-nav a { padding: 20px 16px; border-right: 1px solid #8b8f9844; }
+.discovery-nav a:last-child { border-right: 0; }
+.discovery-nav a > span { display: flex; justify-content: space-between; gap: 8px; font-weight: 600; }
+.discovery-nav small { display: block; margin-top: 5px; opacity: .65; }
+@media(max-width: 640px) { .discovery-nav { grid-template-columns: repeat(2,minmax(0,1fr)); } .discovery-nav a { padding: 16px 8px; } .discovery-nav a:nth-child(2) { border-right: 0; } }
+
 .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .17em; color: #b7222e; }
 .home-stage { position: relative; }
 .home-edition { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:24px; }
@@ -34,7 +56,9 @@
 .home-rail { display:none; }
 .home-campaign-strip { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0; }
 .brand-campaign { position:relative; overflow:hidden; border-radius:16px; }
-.campaign-avci { background:#cafa48; color:#15200c; }
+.campaign-avci { background:radial-gradient(ellipse at top left, #611626 0, transparent 60%),linear-gradient(140deg,#171017,#08090d); color:#fff; border:1px solid #7a566555; }
+.campaign-avci .campaign-art { color:#ff3345; }
+.campaign-avci .campaign-cta { background:#ee132b; border:0; border-radius:999px; padding:12px; gap:8px; }
 .campaign-adana { background:#143d50; color:#fff5dd; }
 .campaign-disclosure { position:absolute; top:12px; right:12px; z-index:2; font-size:8px; letter-spacing:.15em; opacity:.65; }
 .campaign-link { display:flex; flex-direction:column; min-height:540px; padding:28px 18px 20px; }
@@ -52,7 +76,7 @@
 .campaign-brand img { display:block; width:100%; max-height:56px; object-fit:contain; object-position:left center; filter:brightness(1.25); margin-bottom:6px; }
 .campaign-avci-gif { background:#0c0a0d; border:1px solid rgba(255,255,255,.7); }
 .campaign-gif-link { display:block; position:relative; overflow:hidden; border-radius:inherit; }
-.campaign-gif-link img { display:block; width:100%; height:auto; min-height:150px; object-fit:cover; }
+.campaign-gif-link img { display:block; width:100%; height:auto; object-fit:contain; }
 .campaign-gif-link .campaign-disclosure { color:#fff; }
 .campaign-link:hover .campaign-cta { opacity:.7; }
 .campaign-compact .campaign-link { min-height:190px; padding:24px; display:grid; grid-template-columns:1fr 1.4fr; column-gap:16px; }

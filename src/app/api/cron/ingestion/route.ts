@@ -25,6 +25,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
+  const startedAt = new Date().toISOString();
+  await prisma.siteSetting.upsert({ where: { key: "newsroom.health.cron" }, create: { key: "newsroom.health.cron", value: { startedAt, status: "RUNNING" } }, update: { value: { startedAt, status: "RUNNING" } } });
   const publishedScheduled = await publishDueArticles();
   const activeFeeds = await prisma.feed.findMany({ where: { isActive: true } });
 
@@ -44,5 +46,6 @@ export async function GET(request: Request) {
     }
   }
 
+  await prisma.siteSetting.update({ where: { key: "newsroom.health.cron" }, data: { value: { startedAt, finishedAt: new Date().toISOString(), status: results.some(r => !r.ok) ? "PARTIAL" : "SUCCESS", publishedScheduled, processedFeeds: results.length, failedFeeds: results.filter(r => !r.ok).length } } });
   return NextResponse.json({ publishedScheduled, processedFeeds: results.length, results });
 }

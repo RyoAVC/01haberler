@@ -137,6 +137,7 @@ export default async function ArticleDetailPage({ params }: Props) {
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rule-top rule-bottom py-3">
             <ShareButtons url={canonicalUrl} title={article.title} />
             <SaveArticleButton slug={article.slug} title={article.title} />
+            <Link href={`/ihbar?haber=${encodeURIComponent(canonicalUrl)}`} className="text-caption underline">Düzeltme bildir</Link>
           </div>
 
           <AdSlot placement="ARTICLE_AFTER_LEAD" categorySlug={article.category.slug} eager />

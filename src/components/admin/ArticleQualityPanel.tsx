@@ -23,7 +23,7 @@ export function ArticleQualityPanel({ value }: { value: ArticleQualityInput }) {
           </button>
         </li>)}
       </ul>}
-      <p className="mt-3 text-caption text-ink-secondary dark:text-ink-dark-secondary">Uyarılar yazdıkça güncellenir ve tek başına kaydı engellemez. Kaynak, tarih ve bilgi doğruluğunu editör ayrıca kontrol etmelidir.</p>
+      <p className="mt-3 text-caption text-ink-secondary dark:text-ink-dark-secondary">Uyarılar yazdıkça güncellenir ve tek başına kaydı engellemez. İçe aktarılan haberlerde kaynak bağlantısı ve tarih biçimi denetlenir; bilgi doğruluğunu editör kontrol etmelidir.</p>
     </section>
   );
 }

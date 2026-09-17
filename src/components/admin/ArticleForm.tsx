@@ -10,6 +10,7 @@ import { saveArticle } from "@/server/actions/articleActions";
 import { suggestExcerptAction, suggestSeoMetaAction } from "@/server/actions/aiEditorActions";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { ArticleQualityPanel } from "@/components/admin/ArticleQualityPanel";
+import { AiHeadlineSuggestions } from "@/components/admin/AiHeadlineSuggestions";
 
 interface Option {
   id: string;
@@ -31,6 +32,9 @@ interface ExistingArticle {
   canonicalUrl: string | null;
   status: string;
   scheduledAt?: string;
+  sourceUrl?: string | null;
+  sourceRequired?: boolean;
+  sourcePublishedAt?: string | null;
   updatedAt?: string;
   isBreaking: boolean;
   isFeatured: boolean;
@@ -85,7 +89,7 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
   async function handleAiExcerpt() {
     setAiError(null);
     setAiExcerptLoading(true);
-    const result = await suggestExcerptAction(title, getContentText());
+    const result = await suggestExcerptAction(title, getContentText()).catch(() => ({ error: "AI önerisi alınamadı. Saatlik kullanım sınırını veya servis bağlantısını kontrol edin.", excerpt: undefined }));
     setAiExcerptLoading(false);
     if (result.error) setAiError(result.error);
     else if (result.excerpt) setExcerpt(result.excerpt);
@@ -94,7 +98,7 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
   async function handleAiSeoMeta() {
     setAiError(null);
     setAiSeoLoading(true);
-    const result = await suggestSeoMetaAction(title, getContentText());
+    const result = await suggestSeoMetaAction(title, getContentText()).catch(() => ({ error: "AI önerisi alınamadı. Saatlik kullanım sınırını veya servis bağlantısını kontrol edin.", metaTitle: undefined, metaDescription: undefined }));
     setAiSeoLoading(false);
     if (result.error) setAiError(result.error);
     else {
@@ -140,7 +144,9 @@ export function ArticleForm({ categories, tags, authors, canPublish, article, ai
       {error && <p role="alert" className="border border-brand-red px-3 py-2 text-headline-s text-brand-red">{error}</p>}
       {userId && <EditorDraftRecovery paused={saving || draftSaved} storageKey={`01h-editor:${userId}:${article?.id ?? "new"}`} value={{ title, excerpt, contentHtml, metaTitle, metaDescription }} baseline={{ title: article?.title ?? "", excerpt: article?.excerpt ?? "", contentHtml: article?.contentHtml ?? "", metaTitle: article?.metaTitle ?? "", metaDescription: article?.metaDescription ?? "" }} onRestore={draft => { setDraftSaved(false); setTitle(draft.title); setExcerpt(draft.excerpt); setContentHtml(draft.contentHtml); setMetaTitle(draft.metaTitle); setMetaDescription(draft.metaDescription); setEditorGeneration(current => current + 1); }} />}
       <details className="rounded-lg border border-line-dark p-4"><summary className="cursor-pointer text-caption">Metin önizlemesi</summary><div className="mt-4 rounded-lg bg-white p-5 text-neutral-900"><h2 className="font-serif text-headline-l">{title || "Haber başlığı"}</h2><p className="mt-3 font-medium">{excerpt}</p><p className="mt-5 whitespace-pre-wrap text-body">{qualityText(contentHtml)}</p></div><p className="mt-2 text-caption text-ink-dark-secondary">Yayın öncesi metin kontrolü; sitenin tüm yerleşimini temsil etmez.</p></details>
-      <ArticleQualityPanel value={{ title, excerpt, contentHtml, categoryId, coverMediaId, coverImageAlt, metaTitle, metaDescription }} />
+      <ArticleQualityPanel value={{ title, excerpt, contentHtml, categoryId, coverMediaId, coverImageAlt, metaTitle, metaDescription, sourceUrl: article?.sourceUrl, sourceRequired: article?.sourceRequired, sourcePublishedAt: article?.sourcePublishedAt }} />
+      {aiEditorEnabled && <AiHeadlineSuggestions title={title} content={contentHtml} onApply={setTitle} />}
+      {article?.sourceRequired && <section id="sourceInfo" tabIndex={-1} className="rounded border border-line-dark p-4 text-caption"><h2 className="font-semibold">Kaynak kontrolü</h2><p className="mt-2 break-all">{article.sourceUrl ?? "Kaynak bağlantısı yok"}</p><p>Kaynak yayın zamanı: {article.sourcePublishedAt ? new Date(article.sourcePublishedAt).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" }) : "Doğrulanamadı"}</p><p>Kaynak bağlantısı ve tarih doğru değilse yayımlamadan önce kaynak kaydını kontrol edin.</p></section>}
 
       <div>
         <label htmlFor="title" className="block text-headline-s">Başlık</label>

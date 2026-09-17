@@ -1,0 +1,7 @@
+import Link from "next/link";
+import { ActionForm } from "@/components/admin/ActionForm";
+import { subscribeNewsletter } from "@/server/actions/newsletterActions";
+import { newsletterConfigured } from "@/server/services/newsletterService";
+export const dynamic = "force-dynamic";
+export const metadata = { title: "01 Haberler bülteni" };
+export default function NewsletterPage() { return <div className="container-page py-10"><header className="module-heading"><p className="eyebrow">GÜNDEM, GELEN KUTUNUZDA</p><h1>Günün önemli haberleri.</h1><p>Editörün hazırladığı haber özetleri. Abonelik e-posta doğrulamasıyla başlar; her bültenden kolayca çıkabilirsiniz.</p></header>{newsletterConfigured() ? <ActionForm action={subscribeNewsletter}><label>E-posta adresi<input name="email" type="email" required maxLength={254} autoComplete="email" /></label><label className="hidden" aria-hidden>Web sitesi<input name="website" tabIndex={-1} autoComplete="off" /></label><label className="flex gap-2"><input type="checkbox" name="consent" required /><span>01 Haberler bültenini almak istiyorum; <Link href="/gizlilik" className="underline">gizlilik açıklamasını</Link> okudum.</span></label><button className="module-button">Doğrulama bağlantısı gönder</button></ActionForm> : <section className="module-card"><h2 className="font-serif text-headline-m">Bülten yakında</h2><p className="mt-3">Abonelik açıldığında bu sayfadan katılabilirsiniz.</p><Link href="/rss.xml" className="mt-4 inline-block underline">Şimdilik RSS ile takip edin →</Link></section>}</div>; }

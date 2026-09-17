@@ -35,5 +35,5 @@ it("renders review guidance and non-submitting field links without claiming fact
   expect(html).toContain('type="button"');
   expect(html).toContain('role="status"');
   expect(html).toContain("1 nokta gözden geçirilmeli");
-  expect(html).toContain("bilgi doğruluğunu editör ayrıca kontrol etmelidir");
+  expect(html).toContain("bilgi doğruluğunu editör kontrol etmelidir");
 });

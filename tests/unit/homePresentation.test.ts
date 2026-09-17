@@ -19,7 +19,8 @@ vi.mock("@/server/services/articleService", () => ({
   getMostRead: async () => fixtures.latest,
   getArticlesByCategorySlugForHome: async (slug: string) => ["gundem", "ekonomi"].includes(slug) ? fixtures.latest : [],
 }));
-vi.mock("@/lib/db", () => ({ prisma: { category: { findUnique: async () => null } } }));
+vi.mock("@/lib/db", () => ({ prisma: { category: { findUnique: async () => null }, media: { findMany: async () => [] }, siteSetting: { findMany: async () => [] } } }));
+vi.mock("@/components/newsroom/HomeDiscovery", () => ({ HomeDiscovery: () => React.createElement("nav", null, "Konu dosyaları · Yerel gündem") }));
 vi.mock("@/server/services/moduleFlagsService", () => ({ isModuleEnabled: async () => false }));
 vi.mock("@/server/services/homeSettingsService", () => ({ getHomeSettings: async () => ({ headlineIds: [], campaignsEnabled: true }) }));
 vi.mock("@/server/services/pollService", () => ({ getActivePoll: async () => null }));

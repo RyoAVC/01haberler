@@ -41,6 +41,12 @@ export async function Footer() {
           </h3>
           <ul className="mt-3 space-y-2 text-headline-s font-normal text-ink-secondary dark:text-ink-dark-secondary">
             <li><Link href="/okuma-listem" className="hover:text-brand-red">Okuma listem</Link></li>
+            <li><Link href="/takip" className="hover:text-brand-red">Takip ettiklerim</Link></li>
+            <li><Link href="/konu" className="hover:text-brand-red">Konu dosyaları</Link></li>
+            <li><Link href="/yerel" className="hover:text-brand-red">Yerel haber merkezi</Link></li>
+            <li><Link href="/canli" className="hover:text-brand-red">Canlı anlatım</Link></li>
+            <li><Link href="/ihbar" className="hover:text-brand-red">İhbar ve düzeltme</Link></li>
+            <li><Link href="/bulten" className="hover:text-brand-red">E-posta bülteni</Link></li>
             <li>
               RSS: <Link href="/rss.xml" className="hover:text-brand-red">/rss.xml</Link>
             </li>

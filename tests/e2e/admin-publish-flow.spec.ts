@@ -16,7 +16,7 @@ test.describe("Haber olusturma ve yayinlama", () => {
     await page.goto("/admin/haberler/yeni");
     await page.locator("#title").fill(uniqueTitle);
     await page.locator("#excerpt").fill("Bu haber Playwright uctan uca testi tarafindan olusturulmustur.");
-    await page.locator("#contentHtml").fill("<p>Bu haberin govde icerigi test amaclidir ve yeterince uzundur.</p>");
+    await page.locator('[contenteditable="true"]').fill("Bu haberin govde icerigi test amaclidir ve yeterince uzundur.");
     await page.locator("#categoryId").selectOption({ index: 1 });
     await page.locator("#status").selectOption("PUBLISHED");
     await page.getByRole("button", { name: "Kaydet" }).click();

@@ -3,6 +3,7 @@ import { hasPermission } from "@/lib/auth/rbac";
 import { formatDateTr } from "@/lib/utils/formatDate";
 import { getReleaseNotes } from "@/server/services/releaseNoteService";
 import { saveReleaseNote, deleteReleaseNoteAction } from "@/server/actions/releaseNoteActions";
+import { softwareRelease } from "@/lib/softwareRelease";
 
 const TYPE_LABEL: Record<string, string> = {
   FEATURE: "Yeni Özellik",
@@ -27,6 +28,7 @@ export default async function AdminReleaseNotesPage() {
       </p>
 
       <div className="mt-6 space-y-6">
+        {!releaseNotes.some(note => note.version === softwareRelease.version) && <section className="module-card"><p className="eyebrow">BU YAZILIMLA GELEN SÜRÜM</p><h2 className="my-3 font-serif text-headline-m">{softwareRelease.version} — {softwareRelease.title}</h2><p className="text-caption">{softwareRelease.date} · Kaynak koduyla birlikte sürümlenir.</p><ul className="mt-3 list-disc space-y-2 pl-5">{softwareRelease.items.map(item => <li key={item}>{item}</li>)}</ul></section>}
         {releaseNotes.map((note) => (
           <section key={note.id} className="border border-line p-4 dark:border-line-dark">
             <div className="flex items-center justify-between">
