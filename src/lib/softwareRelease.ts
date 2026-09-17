@@ -1,11 +1,11 @@
 export const softwareRelease = {
-  version: "1.13.0",
-  title: "Dosyalarda başlıkla haber seçimi",
+  version: "1.14.0",
+  title: "Manşet öncelikli ana sayfa ve yeni header",
   date: "2026-09-17",
   items: [
-    "Konu, yerel ve canlı dosyalarda başlıkla arama ve tek tıklamayla haber ekleme.",
-    "Seçilen haberleri sıralama, kaldırma ve yinelenen seçim engeli.",
-    "Son 150 haber ve mevcut eski seçimler; en fazla 100 haber. Yayından kaldırılmış seçimler için açıklayıcı uyarı.",
+    "Ana sayfanın ilk içerik alanı manşetler oldu; piyasa radarı ve son haber şeridi manşet altına taşındı.",
+    "Yeni logo düzeni, belirgin son haber bağlantısı ve masaüstünde doğrudan arama alanı.",
+    "Mobilde kompakt header; mevcut menü, tema ve arama erişimi korundu.",
   ],
 };
 export const newsroomModules = [

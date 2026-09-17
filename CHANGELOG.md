@@ -4,6 +4,12 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.14.0 — 2026-09-17
+
+- Ana sayfa manşetle başlar; piyasa radarı ve son haber şeridi altına taşındı.
+- Modern logo düzeni, masaüstü arama formu ve belirgin son haber bağlantısı.
+- Mobil header kompakt tutuldu; menü, tema ve arama erişimi korundu.
+
 ## 1.13.0 — 2026-09-17
 
 - Dosyalarda elle haber kimliği girmek yerine başlık araması ve tek tıklamayla seçim.

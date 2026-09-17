@@ -78,12 +78,7 @@ export default async function HomePage() {
     {homeSettings.campaignsEnabled && <><div className="home-rail home-rail-left"><BrandCampaign brand="avci" /></div>
     <div className="home-rail home-rail-right"><BrandCampaign brand="adana" /></div></>}
     <div className="container-page home-canvas py-6">
-      <div className="home-edition"><div><span className="eyebrow">01 HABERLER · GÜNÜN AKIŞI</span><h1>Gündemi yakından takip edin.</h1></div><Link href="/son-haberler">Tüm gelişmeler <span aria-hidden>↗</span></Link></div>
-      {market && <MarketBoard initial={market} />}
-      <div className="mb-6">
-        <LatestNewsTicker />
-      </div>
-
+      <h1 className="sr-only">01 Haberler — Günün manşetleri</h1>
       {mainHero && (
         <section aria-label="Manşetler" className={`home-headlines ${secondaryHero.length ? "has-secondary" : ""}`}>
           <HomeHeadline article={mainHero} primary focus={focusFor(mainHero.coverMedia?.url)} />
@@ -95,6 +90,8 @@ export default async function HomePage() {
         </section>
       )}
 
+      <div className="my-5"><LatestNewsTicker /></div>
+      {market && <MarketBoard initial={market} />}
       {homeSettings.campaignsEnabled && <div className="home-campaign-strip"><BrandCampaign brand="avci" compact /><BrandCampaign brand="adana" compact /></div>}
 
       <AdSlot placement="HOME_BELOW_HERO" eager />

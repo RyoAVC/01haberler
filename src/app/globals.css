@@ -193,3 +193,20 @@
     animation: marquee 40s linear infinite;
   }
 }
+
+/* Editorial masthead: compact on phones, prominent identity on desktop. */
+.news-header { border-top: 4px solid #bd1831; }
+.masthead { min-height: 100px; }
+.brand-monogram { width: 55px; height: 55px; border-radius: 15px 15px 15px 3px; font-size: 27px; letter-spacing: -2px; box-shadow: 0 6px 18px #bd183124; }
+.brand-name { font-size: 38px; line-height: 1; letter-spacing: -1.8px; }
+.brand-caption { display: block; margin-top: 7px; font-size: 9px; letter-spacing: 2px; font-weight: 600; }
+.edition-label { font-size: 9px; letter-spacing: 1.6px; color: #bd1831; }
+.header-search { align-items:center; gap:12px; max-width:410px; flex:1; padding:12px 16px; border:1px solid #dedbd6; border-radius:14px; }
+.header-search input { width:100%; min-width:0; background:transparent; font-size:12px; outline:none; }
+.header-search:focus-within { outline:2px solid #bd1831; outline-offset:3px; }
+.header-search button { flex-shrink:0; font-size:12px; font-weight:600; }
+.latest-pill { align-items:center; gap:8px; border-radius:30px; background:#bd18310c; color:#bd1831; padding:10px 14px; font-size:12px; font-weight:600; }
+.latest-pill span { width:6px; height:6px; border-radius:50%; background:currentColor; }
+.dark .header-search { border-color:#443e3c; }
+.dark .latest-pill { color:#ff7b8f; background:#ff7b8f12; }
+@media(max-width:639px) { .masthead { min-height:76px; gap:8px; }.brand-monogram { width:42px; height:42px; font-size:22px; border-radius:11px 11px 11px 2px; }.brand-name { font-size:29px; }.brand-caption { font-size:7px; letter-spacing:1.3px; margin-top:5px; }.edition-label { display:none; } }
