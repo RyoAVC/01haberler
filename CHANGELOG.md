@@ -4,6 +4,13 @@ Sürüm numarası package.json ve package-lock.json ile birlikte güncellenir.
 Dağıtım doğrulandıktan sonra aynı sürümün özellikleri /admin/surumler bölümüne kaydedilir.
 Yayına çıkmayan işler panelde taslak olarak tutulur; tamamlanmış gibi gösterilmez.
 
+## 1.11.0 — 2026-09-17
+
+- Medya üzerinde tıklayarak odak seçimi, klavye ile yüzde ayarı ve merkeze alma.
+- 16:9 geniş ekran ve 4:5 mobil kırpma önizlemesi. Özgün medya dosyası değişmez.
+- Görsel yükleme hatasında elle odak düzenleme açıklaması.
+- Sahiplik, yetki, audit ve sunucu koordinat doğrulaması korunur.
+
 ## 1.10.0 — 2026-09-17
 
 - Haber havuzundan birincil/ikincil manşete sürükle-bırak ve erişilebilir yerleştirme düğmeleri.

@@ -1,3 +1,4 @@
+import { MediaFocusPicker } from "@/components/admin/MediaFocusPicker";
 import Image from "next/image";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -30,7 +31,7 @@ export default async function MediaLibraryPage({ searchParams }: { searchParams:
         <details className="mt-4"><summary className="cursor-pointer text-caption underline">Bilgileri düzenle</summary><form action={saveMediaMetadata.bind(null, item.id)} className="mt-3 space-y-3">
           <label className="block text-caption">Alternatif metin<input name="altText" defaultValue={item.altText ?? ""} maxLength={200} className="mt-1 block w-full border border-line-dark bg-transparent p-2" /></label>
           <label className="block text-caption">Fotoğrafçı / kaynak<input name="credit" defaultValue={info?.credit ?? ""} maxLength={300} className="mt-1 block w-full border border-line-dark bg-transparent p-2" /></label>
-          <div className="grid grid-cols-2 gap-3">{(["X", "Y"] as const).map(axis => <label key={axis} className="text-caption">Odak {axis} (0–100)<input type="number" name={`focus${axis}`} min={0} max={100} defaultValue={info?.[axis === "X" ? "focusX" : "focusY"] ?? 50} className="mt-1 w-full border border-line-dark bg-transparent p-2" /></label>)}</div><p className="text-caption">50 merkezdir. Odak, ana sayfa manşetindeki kırpmayı yönlendirir.</p>
+          <MediaFocusPicker url={item.url} initial={info} />
           <label className="block text-caption">Kullanım hakkı ve izin notu<textarea name="rights" defaultValue={info?.rights ?? ""} maxLength={1000} rows={3} className="mt-1 block w-full border border-line-dark bg-transparent p-2" /></label>
           <p className="text-caption text-ink-dark-secondary">Kaynak ve izin notları editör içindir; izin verildiği anlamına gelmez. Haberde ayrıca yazılan alt metin korunur.</p><button className="rounded bg-brand-red px-4 py-2 text-caption text-white">Bilgileri kaydet</button>
         </form></details></div></article>;

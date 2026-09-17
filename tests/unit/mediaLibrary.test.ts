@@ -24,3 +24,17 @@ it("saves bounded metadata with an audit in one transaction", async () => {
   expect(mocks.update).toHaveBeenCalledWith({ where: { id: "image" }, data: { altText: "a".repeat(200) } });
   expect(mocks.transaction).toHaveBeenCalledOnce(); expect(mocks.audit).toHaveBeenCalledOnce();
 });
+
+it("rejects invalid focal coordinates before any writes", async () => {
+  for (const value of ["-1", "101", "NaN", "Infinity"]) {
+    const form = new FormData(); form.set("focusX", value);
+    await expect(saveMediaMetadata("image", form)).rejects.toThrow("0–100");
+  }
+  expect(mocks.transaction).not.toHaveBeenCalled();
+});
+it("persists a selected focal point without changing the original media URL", async () => {
+  const form = new FormData(); form.set("focusX", "25"); form.set("focusY", "75");
+  await saveMediaMetadata("image", form);
+  expect(mocks.upsert).toHaveBeenCalledWith(expect.objectContaining({ update: expect.objectContaining({ value: expect.objectContaining({ focusX: 25, focusY: 75 }) }) }));
+  expect(mocks.update).toHaveBeenCalledWith({ where: { id: "image" }, data: { altText: null } });
+});

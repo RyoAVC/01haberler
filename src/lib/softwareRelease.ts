@@ -1,14 +1,12 @@
 export const softwareRelease = {
-  version: "1.10.0",
-  title: "Gelişmiş manşet planlayıcı",
+  version: "1.11.0",
+  title: "Görsel odak seçimi ve kırpma önizlemesi",
   date: "2026-09-17",
   items: [
-    "Haber havuzundan birincil ve iki ikincil manşet alanına sürükle-bırak; dokunmatik/klavye için yerleştirme düğmeleri.",
-    "Manşet kartlarını zamanlarıyla birlikte sıralama, Türkiye saatine göre başlangıç ve bitiş.",
-    "Mobil ve masaüstü yerleşim önizlemesi; seçilen zamandaki otomatik alternatifleri görme.",
-    "Süresi dolan veya henüz başlamayan seçim yerine en yeni yayındaki haber; manşet grubunda tekrar engeli.",
-    "Sunucuda yetki, yayın durumu, mükerrer seçim ve tarih doğrulaması; ayar ayrıntılarıyla atomik işlem günlüğü.",
-    "Kayıt sırasında çift gönderim engeli; hata halinde formu koruyan açıklama ve başarı bildirimi.",
+    "Medya merkezinde görsele tıklayarak odak noktası seçme.",
+    "Klavyeyle odak yüzdelerini değiştirme ve tek düğmeyle merkeze alma.",
+    "Geniş ekran ve mobil için farklı oranlarda canlı kırpma önizlemesi.",
+    "Özgün dosyayı değiştirmeyen odak ayarı; mevcut sahiplik, yetki ve audit kontrolleri korunur.",
   ],
 };
 export const newsroomModules = [
