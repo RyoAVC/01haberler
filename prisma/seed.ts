@@ -63,7 +63,7 @@ async function main() {
         role: "SUPER_ADMIN",
       },
     });
-    console.log(`UYARI: Ilk giristen sonra bu parolayi degistirin: ${adminPassword}`);
+    console.log("İlk girişten sonra başlangıç parolasını değiştirin. Parola güvenlik nedeniyle loga yazılmaz.");
   }
 
   console.log(
