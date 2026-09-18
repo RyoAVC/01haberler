@@ -7,7 +7,7 @@ import { slugify } from "@/lib/utils/slug";
 import { estimateReadingTimeMinutes } from "@/lib/utils/readingTime";
 import { sanitizeArticleHtml } from "@/lib/utils/sanitize";
 import { isModuleEnabled } from "@/server/services/moduleFlagsService";
-import { autoEditForPublish } from "@/server/services/aiEditorService";
+import { autoEditForPublish, type AutoEditResult } from "@/server/services/aiEditorService";
 import { findBannedWordMatches } from "@/server/services/bannedWordService";
 import type { JobTrigger } from "@prisma/client";
 import { validSourceDate } from "@/lib/utils/sourceDate";
@@ -97,20 +97,23 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
       });
       const safeExcerpt = item.excerpt || item.title;
 
-      let autoEdit = null;
+      let autoEdit: AutoEditResult | null = null;
+      let autoEditFailure: string | null = null;
       if (autoPublishEligible && sourceDate) {
-        autoEdit = await autoEditForPublish({
+        const outcome = await autoEditForPublish({
           title: item.title,
           excerptSource: safeExcerpt,
           sourceName: feed.source.name,
           sourceUrl: dedupe.canonicalUrl,
           categoryName: category?.name ?? null,
         });
+        if (outcome.ok) autoEdit = outcome.result;
+        else autoEditFailure = outcome.reason + (outcome.detail ? `: ${outcome.detail}` : "");
       }
 
       if (autoEdit) {
         const { blocking } = await findBannedWordMatches(`${autoEdit.title} ${autoEdit.contentHtml}`);
-        if (blocking.length > 0) autoEdit = null;
+        if (blocking.length > 0) { autoEdit = null; autoEditFailure = `banned_words: ${blocking.join(", ")}`; }
       }
 
       const slug = await generateUniqueSlug(autoEdit?.title ?? item.title);
@@ -151,6 +154,14 @@ export async function runIngestionJob(feedId: string, triggeredBy: JobTrigger): 
       if (autoEdit) {
         await prisma.auditLog.create({
             data: { userId: null, action: "ARTICLE_AI_DRAFT_PREPARED", entityType: "Article", entityId: article.id },
+        });
+      } else if (autoEditFailure) {
+        // Uygun oldugu halde AI duzenlemesi basarisiz oldugunda nedeni denetim
+        // kaydina yaz - aksi halde sebep yalnizca sunucu logunda kalir ve
+        // teshis icin shell erisimi gerekir.
+        await prisma.auditLog.create({
+            data: { userId: null, action: "ARTICLE_AI_AUTO_EDIT_FAILED", entityType: "Article", entityId: article.id,
+              metadata: { reason: autoEditFailure } },
         });
       }
 
