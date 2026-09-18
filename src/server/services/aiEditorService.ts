@@ -63,6 +63,13 @@ async function askAnthropic(prompt: string, timeoutMs = 20000): Promise<string> 
 // Google AI Studio'nun ucretsiz katmani (kredi karti gerektirmez, gunluk
 // istek sinirlidir) - resmi SDK yerine dogrudan REST cagrisi kullaniyoruz,
 // boylece ek bir bagimlilik gerekmiyor.
+//
+// thinkingConfig.thinkingBudget:0 -> "dusunme" adimini kapatir. Bu modeller
+// basit istekte bile onemli miktarda dusunme tokeni harcayip yaniti
+// geciktirebiliyor (canli olcumde 40 sn zaman asimina bile takildi); yapisi
+// geregi kisa/katı formatli ciktimiz icin dusunmenin kaliteye katkisi yok,
+// sadece gecikme ekliyor. Saglayici bu alani tanimazsa yoksayar/hata doner;
+// hata durumunda mevcut retry/timeout guvenlik agi devrede kalir.
 async function askGemini(prompt: string, timeoutMs = 20000): Promise<string> {
   const model = env.AI_SUMMARY_MODEL || "gemini-flash-latest";
   const res = await fetch(
@@ -71,7 +78,10 @@ async function askGemini(prompt: string, timeoutMs = 20000): Promise<string> {
       method: "POST",
       signal: AbortSignal.timeout(timeoutMs),
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { thinkingConfig: { thinkingBudget: 0 } },
+      }),
     }
   );
 
