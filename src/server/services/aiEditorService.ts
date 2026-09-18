@@ -30,7 +30,7 @@ function describeError(err: unknown): string {
 async function askAnthropic(prompt: string): Promise<string> {
   const client = new Anthropic({ apiKey: env.AI_SUMMARY_API_KEY, timeout: 20000, maxRetries: 0 });
   const message = await client.messages.create({
-    model: "claude-haiku-4-5",
+    model: env.AI_SUMMARY_MODEL || "claude-haiku-4-5",
     max_tokens: 300,
     messages: [{ role: "user", content: prompt }],
   });
@@ -42,8 +42,9 @@ async function askAnthropic(prompt: string): Promise<string> {
 // istek sinirlidir) - resmi SDK yerine dogrudan REST cagrisi kullaniyoruz,
 // boylece ek bir bagimlilik gerekmiyor.
 async function askGemini(prompt: string): Promise<string> {
+  const model = env.AI_SUMMARY_MODEL || "gemini-flash-latest";
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${env.AI_SUMMARY_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.AI_SUMMARY_API_KEY}`,
     {
       method: "POST",
       signal: AbortSignal.timeout(20000),
