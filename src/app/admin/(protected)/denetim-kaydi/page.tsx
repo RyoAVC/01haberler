@@ -27,6 +27,16 @@ const ACTION_LABEL: Record<string, string> = {
   AD_DELETE: "Reklam alanı sildi",
 };
 
+// Metadata (or. { reason: "timeout" }) okunabilir kisa metne cevrilir.
+// Genel amacli: hangi action olursa olsun metadata varsa gosterir.
+function formatMetadata(value: unknown): string | null {
+  if (!value || typeof value !== "object") return null;
+  const parts = Object.entries(value as Record<string, unknown>)
+    .filter(([, v]) => v !== null && v !== undefined && v !== "")
+    .map(([k, v]) => `${k}: ${typeof v === "string" ? v : JSON.stringify(v)}`);
+  return parts.length ? parts.join(" · ") : null;
+}
+
 export default async function AdminAuditLogPage() {
   const user = await getCurrentUser();
   if (!user || !hasPermission(user.role, "audit:view")) {
@@ -51,21 +61,28 @@ export default async function AdminAuditLogPage() {
             <th className="py-2 pr-4">Kullanıcı</th>
             <th className="py-2 pr-4">İşlem</th>
             <th className="py-2 pr-4">Nesne</th>
+            <th className="py-2 pr-4">Detay</th>
           </tr>
         </thead>
         <tbody>
-          {logs.map((log) => (
-            <tr key={log.id} className="border-b border-line dark:border-line-dark">
-              <td className="py-2 pr-4 text-caption text-ink-secondary dark:text-ink-dark-secondary">{formatDateTr(log.createdAt)}</td>
-              <td className="py-2 pr-4">{log.user?.name ?? "Sistem"}</td>
-              <td className="py-2 pr-4">{ACTION_LABEL[log.action] ?? log.action}</td>
-              <td className="py-2 pr-4 text-caption text-ink-secondary dark:text-ink-dark-secondary">
-                {log.entityType}{log.entityId ? ` #${log.entityId.slice(0, 8)}` : ""}
-              </td>
-            </tr>
-          ))}
+          {logs.map((log) => {
+            const detail = formatMetadata(log.metadata);
+            return (
+              <tr key={log.id} className="border-b border-line dark:border-line-dark">
+                <td className="py-2 pr-4 text-caption text-ink-secondary dark:text-ink-dark-secondary">{formatDateTr(log.createdAt)}</td>
+                <td className="py-2 pr-4">{log.user?.name ?? "Sistem"}</td>
+                <td className="py-2 pr-4">{ACTION_LABEL[log.action] ?? log.action}</td>
+                <td className="py-2 pr-4 text-caption text-ink-secondary dark:text-ink-dark-secondary">
+                  {log.entityType}{log.entityId ? ` #${log.entityId.slice(0, 8)}` : ""}
+                </td>
+                <td className="max-w-xs truncate py-2 pr-4 text-caption text-ink-secondary dark:text-ink-dark-secondary" title={detail ?? undefined}>
+                  {detail ?? "—"}
+                </td>
+              </tr>
+            );
+          })}
           {logs.length === 0 && (
-            <tr><td colSpan={4} className="py-3 text-ink-secondary dark:text-ink-dark-secondary">Henüz kayıt yok.</td></tr>
+            <tr><td colSpan={5} className="py-3 text-ink-secondary dark:text-ink-dark-secondary">Henüz kayıt yok.</td></tr>
           )}
         </tbody>
       </table>
