@@ -47,6 +47,9 @@ const envSchema = z.object({
     .transform((v) => v === "true"),
   AI_SUMMARY_PROVIDER: z.string().default(""),
   AI_SUMMARY_API_KEY: z.string().default(""),
+  // Bos birakilirsa saglayiciya gore guvenli varsayilan kullanilir
+  // (gemini -> gemini-flash-latest, anthropic -> claude-haiku-4-5).
+  AI_SUMMARY_MODEL: z.string().default(""),
   PEXELS_API_KEY: z.string().default(""),
   CRON_SECRET: z.string().min(16).optional(),
   VAPID_PUBLIC_KEY: z.string().default(""),

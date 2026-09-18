@@ -20,7 +20,7 @@ export const MODULE_LABELS: Record<ModuleKey, string> = {
   redirects: "301 Yönlendirmeler",
   weather: "Hava Durumu",
   currency: "Döviz Kuru",
-  aiAutoPublish: "AI Kaynak Düzenleme (Editör Onaylı)",
+  aiAutoPublish: "AI Kaynak Düzenleme + Otomatik Yayın",
 };
 
 export const DEFAULT_MODULE_FLAGS: Record<ModuleKey, boolean> = {
